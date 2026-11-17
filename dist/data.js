@@ -3,6 +3,7 @@ export const met='https://www.metmuseum.org/art/collection/search/251476';
 export const gods='https://www.theoi.com/greek-mythology/olympian-gods.html';
 export const book=(w,n)=>'https://www.theoi.com/Text/Homer'+(w===1?'Iliad':'Odyssey')+n+'.html';
 export const people=[
+['hermes','赫米斯','Hermes',[0,1,2],'眾神的使者。《伊利亞德》中，他護送普里阿摩斯進入希臘軍營。《奧德賽》中，他把宙斯的命令帶給卡呂普索。',[[1,24],[2,5]]],
 ['athena','雅典娜','Athena',[0,1,2],'智慧、戰略與工藝的女神。她在《伊利亞德》制止阿基里斯拔劍，也在《奧德賽》鼓勵忒勒瑪科斯出海尋父。',[[1,1],[2,1]]],
 ['zeus','宙斯','Zeus',[0,1,2],'掌管天空與雷霆的眾神之王。《伊利亞德》開篇，他答應忒提斯為阿基里斯討回榮譽。',[[1,1],[2,1]]],
 ['hera','赫拉','Hera',[0,1],'婚姻女神，也是宙斯的妻子。《伊利亞德》中，她支持希臘聯軍，並派雅典娜制止阿基里斯與阿伽門農的衝突。',[[1,1]]],
