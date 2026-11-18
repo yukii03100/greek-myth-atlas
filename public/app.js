@@ -1,7 +1,6 @@
 import {groups,met,gods,book,people,events,relations} from './data.js';
 
 const app=document.querySelector('#app');
-const key='aegean-myth-references';
 const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link=(url,label)=>'<a href="'+escapeHtml(url)+'">'+escapeHtml(label)+'</a>';
 const person=id=>people.find(row=>row[0]===id);
@@ -32,12 +31,15 @@ function defaultCover(id){
   return item?{image:item[0],note:item[1],source:item[2],license:item[3]}:null;
 }
 let saved={};
-try{saved=JSON.parse(localStorage.getItem(key))||{}}catch{}
+async function loadSaved(){
+  try{const rows=await fetch('/api/references').then(r=>r.json());saved={};for(const item of rows){const current=saved[item.owner]||{refs:[]};if(item.kind==='cover')current.cover=item;else current.refs.push(item);saved[item.owner]=current}}catch{saved={}}
+}
 function safeUrl(value){
   try{const url=new URL(value);return ['https:','http:'].includes(url.protocol)?url.href:''}catch{return ''}
 }
 function figure(item,alt){
-  return '<figure><img src="'+escapeHtml(item.image)+'" alt="'+escapeHtml(alt)+'"><figcaption>'+escapeHtml(item.note)+(item.source?' · '+link(item.source,'圖像來源'):'')+(item.license?' · '+link(item.license,'授權'):'')+'</figcaption></figure>';
+  const status=item.transparency==='possible'?'可能含透明背景':item.transparency==='no'?'非透明格式':'透明度未檢查';
+  return '<figure><img src="'+escapeHtml(item.image)+'" alt="'+escapeHtml(alt)+'"><figcaption>'+escapeHtml(item.note)+(item.source?' · '+link(item.source,'圖像來源'):'')+(item.license?' · '+(safeUrl(item.license)?link(item.license,'授權'):escapeHtml(item.license)):'')+(item.id?' · <span class="asset-status">'+status+'</span><span class="asset-actions"><button data-edit="'+item.id+'">編輯</button><button data-delete="'+item.id+'">刪除</button></span>':'')+'</figcaption></figure>';
 }
 function portrait(id){
   const cover=saved[id]?.cover||defaultCover(id);
@@ -64,8 +66,8 @@ ${editor(true)}</section>
 <section><h2>相關人物</h2>${relationshipList(relations.filter(([a,_,b])=>a===id||b===id))}</section>`;
 }
 function editor(cover){
-  return `<details><summary>${cover?"新增參考圖或更換主圖":"新增服裝參考"}</summary><p><small>可上傳圖片或輸入圖片網址。新增內容會儲存在目前的瀏覽器。</small></p>
-<form id="edit">${cover?'<label>用途<select name="kind"><option value="reference">新增 Reference</option><option value="cover">更換主圖</option></select></label>':""}<label>上傳圖片（立繪建議用透明 PNG）<input name="file" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><label>圖片網址<input name="url" type="url"></label><label>參考筆記<input name="note" maxlength="200"></label><label>來源連結<input name="source" type="url"></label><div><button>儲存</button></div><output aria-live="polite"></output></form></details>`;
+  return `<details><summary>${cover?"新增參考圖或更換主圖":"新增服裝參考"}</summary><p><small>圖片與筆記會持久保存，可跨裝置使用。透明立繪建議上傳 PNG 或 WebP。</small></p>
+<form id="edit">${cover?'<label>用途<select name="kind"><option value="reference">新增 Reference</option><option value="cover">更換主圖</option></select></label>':""}<label>上傳圖片（立繪建議用透明 PNG）<input name="file" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><label>圖片網址<input name="url" type="url"></label><label>參考筆記<input name="note" maxlength="500"></label><label>來源連結<input name="source" type="url"></label><label>授權名稱或連結<input name="license" placeholder="例如 Public Domain、CC BY 4.0"></label><div><button>儲存</button></div><output aria-live="polite"></output></form></details>`;
 }
 const figureResearch={
   circe:['巴黎市立博物館 · 喀耳刻雕塑習作','https://www.parismuseescollections.paris.fr/en/node/228137'],
@@ -122,38 +124,21 @@ async function saveImage(e,id){
   e.preventDefault();
   const form=e.currentTarget;
   const out=form.querySelector('output');
-  const data=new FormData(form);
-  const file=data.get('file');
-  let image=safeUrl(data.get('url'));
+  const data=new FormData(form);data.set('owner',id);if(!data.get('kind'))data.set('kind','reference');
   try{
-    if(file.size){
-      if(!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)||file.size>1500000){
-        out.textContent='請選擇 1.5 MB 以下的 JPG、PNG、WebP 或 GIF。';
-        return;
-      }
-      image=await new Promise((resolve,reject)=>{
-        const reader=new FileReader();
-        reader.onload=()=>resolve(reader.result);
-        reader.onerror=reject;
-        reader.readAsDataURL(file);
-      });
-    }
-    if(!image){out.textContent='請上傳一張圖或輸入圖片網址。';return}
-    const item={image,note:data.get('note').trim(),source:safeUrl(data.get('source'))};
-    const current=saved[id]||{refs:[]};
-    const next=data.get('kind')==='cover'?{...current,cover:item}:{...current,refs:[...current.refs,item]};
-    const updated={...saved,[id]:next};
-    localStorage.setItem(key,JSON.stringify(updated));
-    saved=updated;
+    const response=await fetch('/api/references',{method:'POST',body:data});const result=await response.json();if(!response.ok)throw new Error(result.error||'儲存失敗');
+    await loadSaved();
     render();
     const details=document.querySelector('details');
     details.open=true;
     details.querySelector('output').textContent='已儲存。';
-  }catch{
-    out.textContent='無法儲存圖片。可以試較小的檔案或使用圖片網址。';
+  }catch(error){
+    out.textContent=error.message||'無法儲存圖片。';
   }
 }
 app.addEventListener('click',e=>{
+  const del=e.target.closest('[data-delete]');if(del){if(confirm('確定刪除這張圖與筆記？'))fetch('/api/references/'+del.dataset.delete,{method:'DELETE'}).then(loadSaved).then(render);return}
+  const edit=e.target.closest('[data-edit]');if(edit){const item=Object.values(saved).flatMap(x=>[x.cover,...x.refs].filter(Boolean)).find(x=>x.id===edit.dataset.edit);if(!item)return;const note=prompt('修改筆記',item.note||'');if(note===null)return;const source=prompt('修改來源連結',item.source||'');if(source===null)return;const license=prompt('修改授權資訊',item.license||'');if(license===null)return;fetch('/api/references/'+item.id,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({note,source,license})}).then(loadSaved).then(render);return}
   const button=e.target.closest('[data-filter]');
   if(!button)return;
   filter=Number(button.dataset.filter);
@@ -161,4 +146,4 @@ app.addEventListener('click',e=>{
   app.querySelector('[aria-pressed="true"]').focus();
 });
 window.addEventListener('hashchange',()=>{render();location.hash==='#characters'?document.querySelector('#characters').scrollIntoView():window.scrollTo(0,0)});
-render();
+loadSaved().then(render);

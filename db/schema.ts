@@ -1,0 +1,2 @@
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+export const references=sqliteTable("references",{id:text("id").primaryKey(),owner:text("owner").notNull(),kind:text("kind").notNull(),image:text("image").notNull(),note:text("note").notNull().default(""),source:text("source").notNull().default(""),license:text("license").notNull().default(""),transparency:text("transparency").notNull().default("unknown"),createdAt:integer("created_at").notNull()});
