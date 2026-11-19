@@ -48,12 +48,12 @@ function portrait(id){
 function home(){
   const cards=people.filter(p=>filter<0||p[3].includes(filter));
   return `<div class="poster ${posterSeen?"seen":""}">
-  <div class="poster-copy"><p>希臘神話與荷馬史詩</p><h1>神與<br>凡人</h1><a href="#characters" class="enter">探索角色 ↓</a></div>
-  <div class="poster-art" aria-hidden="true"><div class="blue"></div><img class="poster-athena ${saved.athena?.cover?"":"museum-athena"}" src="${escapeHtml(saved.athena?.cover?.image||'athena-figure.jpg')}" alt=""><img class="column" src="column-figure.jpg" alt=""></div>
-  <a class="poster-credit" href="#character/athena">雅典娜 · 查看角色</a>
+  <div class="poster-copy"><p>ARCHIVE OF GODS &amp; MORTALS</p><h1 aria-label="MYTHS"><span>MY</span><span>THS</span></h1><div class="poster-sub"><b>希臘神話圖鑑</b><small>奧林帕斯主神<br>《伊利亞德》與《奧德賽》</small></div><a href="#characters" class="enter">探索角色</a></div>
+  <div class="poster-art" aria-hidden="true"><div class="blue-disc"></div><div class="red-block"></div><div class="paper-label">ΜΥΘΟΣ<br><small>ATHENA / 01</small></div><img class="poster-athena ${saved.athena?.cover?"":"museum-athena"}" src="${escapeHtml(saved.athena?.cover?.image||'athena-figure.jpg')}" alt=""><img class="column" src="column-figure.jpg" alt=""><img class="marble-fragment" src="athena-detail.jpg" alt=""><div class="laurel">❧</div><div class="fine-rule"></div></div>
+  <a class="poster-credit" href="#character/athena">雅典娜 / ATHENA</a>
   </div>
   <section id="characters"><h2>角色介紹</h2><div class="filters">${['全部',...groups].map((g,i)=>`<button data-filter="${i-1}" aria-pressed="${filter===i-1}">${g}</button>`).join('')}</div>
-  <div class="portraits">${cards.map(([id,name,en])=>`<a class="portrait" href="#character/${id}"><span class="portrait-image">${portrait(id)}</span><span class="portrait-name"><strong>${name}</strong><small>${en}</small></span></a>`).join('')}</div></section>`;
+  <div class="portraits">${cards.map(([id,name,en,tags],index)=>`<a class="portrait" href="#character/${id}"><span class="portrait-index">${String(index+1).padStart(2,'0')}</span><span class="portrait-image">${portrait(id)}</span><span class="portrait-name"><strong>${name}</strong><small>${en}</small><i>${tags.map(t=>groups[t]).join(' / ')}</i></span><span class="portrait-mark"></span></a>`).join('')}</div></section>`;
 }
 function detail([id,name,en,tags,bio,volumes]){
   const custom=saved[id]||{refs:[]};
