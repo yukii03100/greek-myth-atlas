@@ -64,7 +64,7 @@ function home(){
   </section>
   <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>先選分類，再跳到角色</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
   <div class="character-showcase"><aside class="avatar-rail" aria-label="目前分類角色索引">${cards.map(([id,name])=>`<a href="#show-${id}" title="${name}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</aside>
-  <div class="portrait-stories">${cards.map(([id,name,en,tags],index)=>`<article class="portrait-story" id="show-${id}"><div class="story-number">${String(index+1).padStart(2,'0')}</div><div class="story-copy"><small>${tags.map(t=>groups[t]).join(' / ')}</small><a href="#character/${id}"><h3>${name}</h3></a><p>${en}</p></div><a class="story-figure" href="#character/${id}" aria-label="${name}">${portrait(id)}</a></article>`).join('')}</div></div></section>`;
+  <div class="portrait-stories">${cards.map(([id,name,en,tags],index)=>`<article class="portrait-story" id="show-${id}"><div class="story-number">${String(index+1).padStart(2,'0')}</div><div class="story-copy"><a href="#character/${id}"><h3>${name}</h3></a><p>${en}</p></div><a class="story-figure" href="#character/${id}" aria-label="${name}">${portrait(id)}</a></article>`).join('')}</div></div></section>`;
 }
 
 function bindHero(){
