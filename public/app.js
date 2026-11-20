@@ -58,6 +58,7 @@ function home(){
   ];
   return `<section class="poster ${posterSeen?"seen":""}" aria-label="MYTHS 雅典娜拼貼封面">
     <img class="hero-reference hero-final-art" src="/hero-myths-serif.png" alt="MYTHS 雅典娜拼貼封面">
+    <img class="hero-s-vine" src="/hero-layers/olive-branch.png" alt="" aria-hidden="true">
     <div class="hero-underlay"><img src="athena-figure.jpg" alt="雅典娜全身立像"></div>
     <div class="hero-layers" aria-hidden="true">${fragments.map(([name,asset,x,y,r],index)=>asset.endsWith?.('.png')?`<img class="hero-fragment fragment-${name}" src="/hero-layers/${asset}" alt="" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">`:`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">${asset==='shape'?'':asset}</span>`).join('')}</div>
   </section>

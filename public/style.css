@@ -92,3 +92,8 @@ html,body{overflow-x:hidden}
    document for motion work, but never obscure the approved composition. */
 .poster:has(.hero-layers){height:auto;min-height:0}.poster:has(.hero-layers) .hero-final-art{position:relative;z-index:3;display:block;width:100%;height:auto;object-fit:contain}.poster:has(.hero-layers) .hero-layers,.poster:has(.hero-layers) .hero-underlay{visibility:hidden;pointer-events:none}
 @media(max-width:760px){.poster:has(.hero-layers){height:auto;min-height:0;margin-bottom:48px}.poster:has(.hero-layers) .hero-final-art{width:100%;height:auto;object-fit:contain}}
+
+/* Olive branch curling around the final S. */
+.hero-s-vine{position:absolute;z-index:5;right:-1.5%;top:18%;width:19%;height:54%;object-fit:contain;object-position:center;transform-origin:72% 78%;transform:rotate(72deg);filter:drop-shadow(0 5px 4px rgba(0,0,0,.1));pointer-events:none;animation:s-vine-breathe 4.8s ease-in-out infinite}.poster:hover .hero-s-vine{animation:s-vine-hover .75s cubic-bezier(.2,.8,.2,1) forwards}@keyframes s-vine-breathe{0%,100%{transform:rotate(72deg) translateY(0)}50%{transform:rotate(70deg) translateY(-4px)}}@keyframes s-vine-hover{from{transform:rotate(72deg) scale(1)}to{transform:rotate(66deg) translate(-8px,-5px) scale(1.08)}}
+@media(max-width:760px){.hero-s-vine{right:-2%;top:17%;width:20%;height:55%}}
+@media(prefers-reduced-motion:reduce){.hero-s-vine,.poster:hover .hero-s-vine{animation:none}}
