@@ -48,8 +48,18 @@ function portrait(id){
 function home(){
   if(filter<0)filter=0;
   const cards=people.filter(p=>p[3][0]===filter);
+  const fragments=[
+    ['blue-disc','shape',-46,-28,-2],['spear','spear.png',-62,20,-6],['temple','temple-column.png',54,-38,3],
+    ['athena','athena-bust.png',-24,18,-2],['shield','round-shield.png',12,64,5],
+    ['olive-left','olive-branch.png',-66,54,-7],['olive-right','olive-branch.png',58,58,7],
+    ['rubble-left','marble-rubble.png',-58,70,-7],['rubble-right','marble-rubble.png',64,72,6],
+    ['letter-m','M',22,-42,-2],['letter-y','Y',36,-22,2],['letter-t','T',48,4,-2],
+    ['letter-h','H',58,28,2],['letter-s','S',70,48,5],['blue-paper','shape',-34,64,-4],['fine-line','shape',62,-16,3]
+  ];
   return `<section class="poster ${posterSeen?"seen":""}" aria-label="MYTHS 雅典娜拼貼封面">
-    <img class="hero-reference" src="/hero-myths.png" alt="MYTHS：雅典娜、希臘柱、盾牌與橄欖枝拼貼封面">
+    <img class="hero-reference hero-final-art" src="/hero-myths-serif.png" alt="MYTHS 雅典娜拼貼封面">
+    <div class="hero-underlay"><img src="athena-figure.jpg" alt="雅典娜全身立像"></div>
+    <div class="hero-layers" aria-hidden="true">${fragments.map(([name,asset,x,y,r],index)=>asset.endsWith?.('.png')?`<img class="hero-fragment fragment-${name}" src="/hero-layers/${asset}" alt="" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">`:`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">${asset==='shape'?'':asset}</span>`).join('')}</div>
   </section>
   <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>先選分類，再跳到角色</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
   <div class="character-showcase"><aside class="avatar-rail" aria-label="目前分類角色索引">${cards.map(([id,name])=>`<a href="#show-${id}" title="${name}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</aside>
@@ -82,11 +92,10 @@ function bindHero(){
 function detail([id,name,en,tags,bio,volumes]){
   const custom=saved[id]||{refs:[]};
   const cover=custom.cover||defaultCover(id);
-  const refs=[...(custom.cover&&defaultCover(id)?[defaultCover(id)]:[]),...(starter[id]||[]),...custom.refs];
+  const archiveRefs=[...(custom.cover&&defaultCover(id)?[defaultCover(id)]:[]),...(starter[id]||[])];
   return `<p>${link('#','← 所有角色')}</p><div class="detail"><div><small>${tags.map(index=>groups[index]).join(' · ')}</small><h1>${name}</h1><small>${en}</small>${custom.cover?'<p>我的角色設計</p>':""}</div>${cover?figure(cover,name):'<figure><figcaption>主圖待更新</figcaption></figure>'}</div>
 <section><h2>神話與史詩</h2><p>${bio}</p><p><small>${volumes.map(([w,n])=>groups[w]+' '+volume(w,n)).join(' · ')}</small></p></section>
-<section><h2>Reference</h2>${figureResearch[id]?'<p>'+link(figureResearch[id][1],figureResearch[id][0])+'</p>':""}<div class="grid">${refs.map(item=>figure(item,item.note||name+'參考圖')).join('')||'<p>參考圖待新增</p>'}</div>
-${editor(true)}</section>
+<section><h2>Reference</h2>${figureResearch[id]?'<p>'+link(figureResearch[id][1],figureResearch[id][0])+'</p>':""}${archiveRefs.length?`<div class="grid">${archiveRefs.map(item=>figure(item,item.note||name+'參考圖')).join('')}</div>`:''}<p class="board-help">點一下畫布後直接貼上圖片（Ctrl／⌘＋V），或把圖片檔拖進來。圖片、位置與尺寸會自動保存。</p>${referenceBoard(id,name)}</section>
 <section><h2>相關人物</h2>${relationshipList(relations.filter(([a,_,b])=>a===id||b===id))}</section>`;
 }
 function editor(cover){
@@ -107,20 +116,21 @@ function wardrobe(){
   <article class="card"><h3>Peplos</h3><p>布料上緣翻折後固定在肩上。畫輪廓時可以留意胸前的雙層布和側邊開口。</p></article>
   <article class="card"><h3>Himation</h3><p>矩形披布，可斜披過一肩，也能裹住雙肩。可以比較不同披法如何改變側面輪廓。</p></article>
   </div><p>${link(dressSource,'The Met · 古希臘服裝')}</p></section>
-  <section><h2>文物穿法</h2><div class="grid">${figure(starter.athena[1],"穿愛奧尼式 Chiton 的雅典娜")}${figure({...defaultCover("aphrodite"),note:"觀察貼身 Chiton 的垂墜。"+defaultCover("aphrodite").note},"穿 Chiton 的阿芙蘿黛蒂像")}</div></section><section class="board-section"><h2>我的服裝參考</h2><p class="board-help">點一下畫布後直接貼上圖片（Ctrl／⌘＋V），也可以把圖片檔拖進來。拖曳圖片移動，右下角縮放，× 刪除。</p>${referenceBoard()}</section>`;
+  <section><h2>文物穿法</h2><div class="grid">${figure(starter.athena[1],"穿愛奧尼式 Chiton 的雅典娜")}${figure({...defaultCover("aphrodite"),note:"觀察貼身 Chiton 的垂墜。"+defaultCover("aphrodite").note},"穿 Chiton 的阿芙蘿黛蒂像")}</div></section>`;
 }
 
 function boardLayout(item,index){try{const data=JSON.parse(item.note||'{}');return {x:Number(data.x)||30+(index%4)*190,y:Number(data.y)||30+Math.floor(index/4)*180,w:Number(data.w)||170,z:Number(data.z)||index+1}}catch{return {x:30+(index%4)*190,y:30+Math.floor(index/4)*180,w:170,z:index+1}}}
-function referenceBoard(){const refs=saved.wardrobe?.refs||[];return `<div class="reference-board" tabindex="0" aria-label="可自由排列的服裝參考板">${refs.map((item,index)=>{const p=boardLayout(item,index);return `<article class="board-item" data-id="${item.id}" style="left:${p.x}px;top:${p.y}px;width:${p.w}px;z-index:${p.z}"><img src="${escapeHtml(item.image)}" alt=""><button class="board-delete" data-delete="${item.id}" aria-label="刪除圖片">×</button><span class="board-resize" aria-hidden="true"></span></article>`}).join('')}<div class="board-empty">${refs.length?'':'在這裡貼上圖片'}</div></div>`}
+function referenceBoard(owner,name){const refs=saved[owner]?.refs||[];return `<div class="reference-board" data-owner="${owner}" tabindex="0" aria-label="${escapeHtml(name)}的創作參考板">${refs.map((item,index)=>{const p=boardLayout(item,index);return `<article class="board-item" data-id="${item.id}" style="left:${p.x}px;top:${p.y}px;width:${p.w}px;z-index:${p.z}"><img src="${escapeHtml(item.image)}" alt=""><button class="board-delete" data-delete="${item.id}" aria-label="刪除圖片">×</button><span class="board-resize" aria-hidden="true"></span></article>`}).join('')}<div class="board-empty">${refs.length?'':'在這裡貼上圖片'}</div></div>`}
 
-async function uploadBoardFile(file){if(!file?.type?.startsWith('image/'))return;const data=new FormData();data.set('owner','wardrobe');data.set('kind','reference');data.set('file',file,file.name||`pasted-${Date.now()}.png`);data.set('note',JSON.stringify({x:35,y:35,w:190,z:Date.now()}));const response=await fetch('/api/references',{method:'POST',body:data});if(!response.ok)throw new Error((await response.json()).error||'圖片貼上失敗');await loadSaved();render()}
+async function uploadBoardFile(file,owner){if(!file?.type?.startsWith('image/'))return;const data=new FormData();data.set('owner',owner);data.set('kind','reference');data.set('file',file,file.name||`pasted-${Date.now()}.png`);data.set('note',JSON.stringify({x:35,y:35,w:190,z:Date.now()}));const response=await fetch('/api/references',{method:'POST',body:data});if(!response.ok)throw new Error((await response.json()).error||'圖片貼上失敗');await loadSaved();render()}
 function saveBoardPosition(item){return fetch('/api/references/'+item.dataset.id,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({note:JSON.stringify({x:item.offsetLeft,y:item.offsetTop,w:item.offsetWidth,z:Number(item.style.zIndex)||1})})})}
 function bindBoard(){
   const board=document.querySelector('.reference-board');if(!board)return;
-  board.addEventListener('paste',e=>{const file=[...e.clipboardData.items].find(x=>x.type.startsWith('image/'))?.getAsFile();if(file){e.preventDefault();uploadBoardFile(file)}});
+  const owner=board.dataset.owner;
+  board.addEventListener('paste',e=>{const file=[...e.clipboardData.items].find(x=>x.type.startsWith('image/'))?.getAsFile();if(file){e.preventDefault();uploadBoardFile(file,owner)}});
   board.addEventListener('dragover',e=>{e.preventDefault();board.classList.add('is-over')});
   board.addEventListener('dragleave',()=>board.classList.remove('is-over'));
-  board.addEventListener('drop',e=>{e.preventDefault();board.classList.remove('is-over');uploadBoardFile([...e.dataTransfer.files].find(x=>x.type.startsWith('image/')))});
+  board.addEventListener('drop',e=>{e.preventDefault();board.classList.remove('is-over');uploadBoardFile([...e.dataTransfer.files].find(x=>x.type.startsWith('image/')),owner)});
   if(window.interact){
     window.interact('.board-item').draggable({ignoreFrom:'.board-delete,.board-resize',modifiers:[window.interact.modifiers.restrictRect({restriction:'.reference-board',endOnly:true})],listeners:{start:e=>e.target.style.zIndex=String(Date.now()),move:e=>{const el=e.target;el.style.left=Math.max(0,el.offsetLeft+e.dx)+'px';el.style.top=Math.max(0,el.offsetTop+e.dy)+'px'},end:e=>saveBoardPosition(e.target)}}).resizable({edges:{right:'.board-resize',bottom:'.board-resize'},modifiers:[window.interact.modifiers.aspectRatio({ratio:'preserve'}),window.interact.modifiers.restrictSize({min:{width:80,height:60},max:{width:700,height:700}})],listeners:{move:e=>{e.target.style.width=e.rect.width+'px'},end:e=>saveBoardPosition(e.target)}});return;
   }
