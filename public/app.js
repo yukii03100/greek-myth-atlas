@@ -45,6 +45,7 @@ function portrait(id){
   const cover=saved[id]?.cover||defaultCover(id);
   return cover?'<img src="'+escapeHtml(cover.image)+'" alt="" loading="lazy">':'<span class="pending">立繪待更新</span>';
 }
+const animatedName=name=>[...String(name)].map((char,index)=>`<span style="--char:${index}">${escapeHtml(char)}</span>`).join('');
 function home(){
   if(filter<0)filter=0;
   const cards=people.filter(p=>p[3][0]===filter);
@@ -65,7 +66,7 @@ function home(){
   </section>
   <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>角色檔案</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
   <div class="character-showcase"><nav class="character-picker" aria-label="目前分類角色">${cards.map(([id,name])=>`<a href="#character/${id}" data-preview="${id}" class="${id===selected[0]?'is-active':''}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</nav>
-  <article class="character-preview" aria-live="polite"><div class="preview-art"><a class="preview-figure" href="#character/${selected[0]}" aria-label="查看 ${selected[1]} 完整資料">${portrait(selected[0])}</a></div><div class="preview-info"><small>SELECTED CHARACTER</small><h3>${selected[1]}</h3><p class="preview-en">${selected[2]}</p><p class="preview-bio">${selected[4]}</p><a class="preview-more" href="#character/${selected[0]}">完整資料與參考板</a></div></article></div></section>`;
+  <article class="character-preview is-changing" aria-live="polite"><div class="preview-art"><a class="preview-figure" href="#character/${selected[0]}" aria-label="查看 ${selected[1]} 完整資料">${portrait(selected[0])}</a></div><div class="preview-info"><small>SELECTED CHARACTER</small><h3>${animatedName(selected[1])}</h3><p class="preview-en">${selected[2]}</p><p class="preview-bio">${selected[4]}</p></div></article></div></section>`;
 }
 
 function bindCharacterPreview(){
@@ -78,10 +79,12 @@ function bindCharacterPreview(){
     preview.querySelector('.preview-figure').href='#character/'+id;
     preview.querySelector('.preview-figure').setAttribute('aria-label','查看 '+item[1]+' 完整資料');
     preview.querySelector('.preview-figure').innerHTML=portrait(id);
-    preview.querySelector('h3').textContent=item[1];
+    preview.querySelector('h3').innerHTML=animatedName(item[1]);
     preview.querySelector('.preview-en').textContent=item[2];
     preview.querySelector('.preview-bio').textContent=item[4];
-    preview.querySelector('.preview-more').href='#character/'+id;
+    preview.classList.remove('is-changing');
+    void preview.offsetWidth;
+    preview.classList.add('is-changing');
   };
   picker.querySelectorAll('[data-preview]').forEach(link=>{
     link.addEventListener('mouseenter',()=>show(link.dataset.preview));
