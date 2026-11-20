@@ -21,3 +21,37 @@ html,body{overflow-x:hidden}
 /* Hero follows the supplied MYTHS artwork exactly. */
 .poster{display:block;min-height:0;margin:0 0 72px;overflow:hidden;background:#fff;border:0;isolation:isolate}.poster:after{display:none}.hero-reference{display:block;width:100%;height:auto;object-fit:contain;animation:hero-reveal .9s cubic-bezier(.2,.75,.25,1) both}.hero-actions{position:absolute;left:2.2%;bottom:3%;z-index:3;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.94);padding:8px 8px 8px 14px;border:1px solid #111;animation:hero-actions .7s .45s both}.hero-actions span{font-size:.78rem;font-weight:700;letter-spacing:.08em}.hero-actions .enter{margin:0;background:#111;color:#fff;padding:.55rem .8rem;text-decoration:none;font-size:.8rem}.poster.seen .hero-reference,.poster.seen .hero-actions{animation:none}@keyframes hero-reveal{from{opacity:0;transform:scale(1.018)}to{opacity:1;transform:none}}@keyframes hero-actions{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media(max-width:680px){.poster{height:min(72vh,610px);margin-bottom:40px}.hero-reference{width:100%;height:100%;object-fit:cover;object-position:40% center}.hero-actions{left:12px;bottom:12px;right:12px;justify-content:space-between}.hero-actions span{font-size:.7rem}}
+
+/* Layered Athena cover */
+.poster{height:min(820px,calc(100svh - 80px));min-height:620px;margin-bottom:90px;position:relative;background:#fff;overflow:hidden}
+.hero-underlay{position:absolute;inset:8% 10% 8%;display:grid;place-items:center;opacity:calc(.08 + var(--scatter,0) * .92);transform:scale(calc(.88 + var(--scatter,0) * .12));transition:opacity .18s linear;z-index:0}
+.hero-underlay img{height:92%;width:auto;max-width:52%;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1) contrast(1.08)}
+.hero-underlay span{position:absolute;right:3%;bottom:8%;font:900 clamp(2.2rem,7vw,6.5rem)/.82 Arial Black,Impact,sans-serif;letter-spacing:-.07em;color:#111;text-align:right}
+.hero-underlay small{font:700 .7rem/1 Arial,sans-serif;letter-spacing:.2em;color:#1738d0}
+.hero-layers{position:absolute;inset:0;z-index:2}
+.hero-fragment{position:absolute;inset:0;background:url('/hero-myths.png') center/100% 100% no-repeat;will-change:transform,opacity;animation:fragment-in .9s cubic-bezier(.16,.78,.2,1) both;animation-delay:calc(var(--i) * 42ms);transition:filter .25s,opacity .18s linear;opacity:calc(1 - var(--scatter,0) * .9)}
+.hero-fragment:hover{filter:drop-shadow(0 12px 12px rgba(0,0,0,.14)) brightness(1.03)}
+.fragment-blue-field{clip-path:polygon(11% 31%,45% 24%,51% 78%,16% 78%)}
+.fragment-crest{clip-path:polygon(9% 17%,39% 17%,39% 45%,10% 43%)}
+.fragment-spear{clip-path:polygon(8% 20%,18% 18%,28% 82%,18% 84%)}
+.fragment-temple{clip-path:polygon(40% 18%,61% 17%,61% 69%,42% 69%)}
+.fragment-athena-face{clip-path:polygon(18% 28%,41% 25%,44% 67%,18% 66%)}
+.fragment-athena-shoulder{clip-path:polygon(13% 57%,49% 54%,49% 89%,12% 89%)}
+.fragment-shield{clip-path:polygon(31% 59%,61% 57%,62% 91%,31% 91%)}
+.fragment-olive-left{clip-path:polygon(8% 59%,35% 54%,35% 84%,8% 84%)}
+.fragment-olive-right{clip-path:polygon(43% 63%,68% 56%,68% 88%,43% 91%)}
+.fragment-letter-m{clip-path:polygon(48% 31%,61% 31%,61% 73%,48% 73%)}
+.fragment-letter-y{clip-path:polygon(59% 31%,70% 31%,70% 73%,59% 73%)}
+.fragment-letter-t{clip-path:polygon(68% 31%,79% 31%,79% 73%,68% 73%)}
+.fragment-letter-h{clip-path:polygon(77% 31%,89% 31%,89% 73%,77% 73%)}
+.fragment-letter-s{clip-path:polygon(87% 31%,98% 31%,98% 73%,87% 73%)}
+.fragment-rubble-a{clip-path:polygon(7% 74%,31% 71%,31% 94%,7% 94%)}
+.fragment-rubble-b{clip-path:polygon(58% 73%,88% 72%,88% 94%,58% 94%)}
+.hero-enter{position:absolute;left:2%;bottom:4%;z-index:4;background:#111;color:#fff;text-decoration:none;padding:.72rem 1rem;font-weight:800;letter-spacing:.08em}
+.hero-hint{position:absolute;right:2%;bottom:4%;z-index:4;margin:0;font-size:.75rem;letter-spacing:.12em}.is-scattered .hero-hint{opacity:0}
+@keyframes fragment-in{from{opacity:0;transform:translateY(calc(-30px - var(--i) * 3px)) rotate(-2deg)}to{opacity:1;transform:none}}
+
+/* Category-first character index */
+.section-heading>p{font:800 .72rem/1 Arial,sans-serif;letter-spacing:.2em;color:#1738d0;margin:0}.section-heading h2{font-size:clamp(2.3rem,5vw,4.8rem);margin:.15em 0 .35em}.filters{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);padding:12px 0;border-bottom:1px solid #111}.filters button{border:0;border-bottom:2px solid transparent;padding:.5rem .2rem;margin-right:1rem;background:transparent;color:#111}.filters button[aria-pressed=true]{border-color:#1738d0;color:#1738d0}.character-showcase{display:grid;grid-template-columns:138px minmax(0,1fr);gap:clamp(20px,5vw,70px);align-items:start}.avatar-rail{position:sticky;top:70px;max-height:calc(100vh - 90px);overflow:auto;padding:16px 8px 16px 0}.avatar-rail a{display:grid;grid-template-columns:54px 1fr;align-items:center;gap:8px;text-decoration:none;margin-bottom:10px;font-size:.78rem}.avatar-rail span{width:54px;height:54px;border-radius:50%;overflow:hidden;background:#efede9;border:1px solid #d7d1c9}.avatar-rail img{width:100%;height:100%;object-fit:cover;object-position:center top}.avatar-rail .pending{display:grid;place-items:center;width:100%;height:100%;font-size:.52rem;text-align:center}.portrait-stories{min-width:0}.portrait-story{min-height:min(760px,82vh);display:grid;grid-template-columns:80px minmax(180px,.65fr) minmax(300px,1.35fr);align-items:center;gap:clamp(16px,4vw,54px);border-bottom:1px solid #d9d5cf;scroll-margin-top:68px;overflow:hidden}.story-number{align-self:start;padding-top:50px;font:800 .75rem Arial,sans-serif;border-top:3px solid #111}.story-copy h3{font-size:clamp(3rem,7vw,7rem);margin:.05em 0;letter-spacing:-.06em}.story-copy p{font:800 .78rem Arial,sans-serif;letter-spacing:.14em}.story-copy>a{display:inline-block;margin-top:1.5rem;background:#1738d0;color:#fff;text-decoration:none;padding:.65rem .9rem}.story-figure{height:min(700px,76vh);display:grid;place-items:end center;text-decoration:none;overflow:hidden}.story-figure img{width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:grayscale(.65);transition:transform .35s,filter .35s}.story-figure:hover img{filter:none;transform:scale(1.025)}.story-figure .pending{align-self:center}
+@media(max-width:760px){.poster{height:68svh;min-height:520px;margin-bottom:56px}.hero-layers{top:18%;bottom:auto;height:58vw}.hero-fragment{background-size:100% 100%;background-position:center}.hero-underlay img{max-width:82%;height:78%}.hero-underlay span{font-size:3rem}.hero-enter{left:12px;bottom:12px}.hero-hint{display:none}.character-showcase{grid-template-columns:72px minmax(0,1fr);gap:12px}.avatar-rail{top:62px}.avatar-rail a{display:block;margin-bottom:8px}.avatar-rail b{display:block;font-size:.68rem;line-height:1.1;margin-top:3px}.portrait-story{min-height:650px;grid-template-columns:1fr;grid-template-rows:auto auto 1fr;gap:6px;padding:26px 0}.story-number{padding-top:6px}.story-copy h3{font-size:3rem}.story-copy>a{margin-top:.3rem}.story-figure{height:420px}.section-heading h2{font-size:2.4rem}}
+@media(prefers-reduced-motion:reduce){.hero-fragment{animation:none!important;transition:none!important}.hero-hint{display:none}}

@@ -46,12 +46,46 @@ function portrait(id){
   return cover?'<img src="'+escapeHtml(cover.image)+'" alt="" loading="lazy">':'<span class="pending">立繪待更新</span>';
 }
 function home(){
-  const cards=people.filter(p=>filter<0||p[3].includes(filter));
-  return `<div class="poster ${posterSeen?"seen":""}">
-  <img class="hero-reference" src="hero-myths.png" alt="MYTHS：雅典娜、希臘柱、盾牌與橄欖枝拼貼封面">
-  </div>
-  <section id="characters"><h2>角色介紹</h2><div class="filters">${['全部',...groups].map((g,i)=>`<button data-filter="${i-1}" aria-pressed="${filter===i-1}">${g}</button>`).join('')}</div>
-  <div class="portraits">${cards.map(([id,name,en,tags],index)=>`<a class="portrait" href="#character/${id}"><span class="portrait-index">${String(index+1).padStart(2,'0')}</span><span class="portrait-image">${portrait(id)}</span><span class="portrait-name"><strong>${name}</strong><small>${en}</small><i>${tags.map(t=>groups[t]).join(' / ')}</i></span><span class="portrait-mark"></span></a>`).join('')}</div></section>`;
+  if(filter<0)filter=0;
+  const cards=people.filter(p=>p[3].includes(filter));
+  const fragments=[
+    ['blue-field',-54,-28,-3],['crest',-18,-64,-5],['spear',-68,24,-7],['temple',58,-42,4],
+    ['athena-face',-24,18,-2],['athena-shoulder',-42,52,-4],['shield',12,70,6],['olive-left',-72,58,-9],
+    ['olive-right',56,62,8],['letter-m',24,-50,-2],['letter-y',38,-26,3],['letter-t',48,8,-2],
+    ['letter-h',60,30,2],['letter-s',72,52,6],['rubble-a',-60,74,-8],['rubble-b',70,76,7]
+  ];
+  return `<section class="poster ${posterSeen?"seen":""}" aria-label="MYTHS 雅典娜拼貼封面">
+    <div class="hero-underlay"><img src="athena-figure.jpg" alt="雅典娜全身立像"><span>ATHENA<br><small>智慧 · 戰略 · 工藝</small></span></div>
+    <div class="hero-layers" aria-hidden="true">${fragments.map(([name,x,y,r],index)=>`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg"></span>`).join('')}</div>
+    <a class="hero-enter" href="#characters">開始探索</a>
+    <p class="hero-hint">向下捲動，讓拼貼散開</p>
+  </section>
+  <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>先選分類，再跳到角色</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
+  <div class="character-showcase"><aside class="avatar-rail" aria-label="目前分類角色索引">${cards.map(([id,name])=>`<a href="#show-${id}" title="${name}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</aside>
+  <div class="portrait-stories">${cards.map(([id,name,en,tags],index)=>`<article class="portrait-story" id="show-${id}"><div class="story-number">${String(index+1).padStart(2,'0')}</div><div class="story-copy"><small>${tags.map(t=>groups[t]).join(' / ')}</small><h3>${name}</h3><p>${en}</p><a href="#character/${id}">查看人物</a></div><a class="story-figure" href="#character/${id}" aria-label="查看${name}">${portrait(id)}</a></article>`).join('')}</div></div></section>`;
+}
+
+function bindHero(){
+  const poster=document.querySelector('.poster');
+  if(!poster)return;
+  const fragments=[...poster.querySelectorAll('.hero-fragment')];
+  const underlay=poster.querySelector('.hero-underlay');
+  const update=()=>{
+    const progress=Math.max(0,Math.min(1,(scrollY-40)/360));
+    poster.style.setProperty('--scatter',progress);
+    poster.classList.toggle('is-scattered',progress>.08);
+    underlay.style.opacity=String(.08+progress*.92);
+    underlay.style.transform=`scale(${.88+progress*.12})`;
+    fragments.forEach(fragment=>{
+      const x=parseFloat(fragment.style.getPropertyValue('--scatter-x'))*progress;
+      const y=parseFloat(fragment.style.getPropertyValue('--scatter-y'))*progress;
+      const r=parseFloat(fragment.style.getPropertyValue('--scatter-r'))*progress;
+      fragment.style.transform=`translate(${x}px,${y}px) rotate(${r}deg)`;
+      fragment.style.opacity=String(1-progress*.9);
+    });
+  };
+  update();
+  addEventListener('scroll',update,{passive:true});
 }
 function detail([id,name,en,tags,bio,volumes]){
   const custom=saved[id]||{refs:[]};
@@ -104,6 +138,7 @@ function render(){
   const views={wardrobe,guide,timeline,relations:relationshipView,sources,studio:()=>'<h1>我流角色互動</h1><p>待更新</p>'};
   const entry=route.startsWith('character/')?person(route.split('/')[1]):null;
   app.innerHTML=entry?detail(entry):Object.hasOwn(views,route)?views[route]():home();
+  bindHero();
   if(app.querySelector(".poster"))posterSeen=true;
   for(const a of document.querySelectorAll('nav a')){
     const active=a.getAttribute('href')==='#'+(entry?'':route);
