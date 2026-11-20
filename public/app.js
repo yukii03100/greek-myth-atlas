@@ -48,6 +48,7 @@ function portrait(id){
 function home(){
   if(filter<0)filter=0;
   const cards=people.filter(p=>p[3][0]===filter);
+  const selected=cards[0];
   const fragments=[
     ['blue-disc','shape',-46,-28,-2],['spear','spear.png',-62,20,-6],['temple','temple-column.png',54,-38,3],
     ['athena','athena-bust.png',-24,18,-2],['shield','round-shield.png',12,64,5],
@@ -62,9 +63,30 @@ function home(){
     <div class="hero-underlay"><img src="athena-figure.jpg" alt="雅典娜全身立像"></div>
     <div class="hero-layers" aria-hidden="true">${fragments.map(([name,asset,x,y,r],index)=>asset.endsWith?.('.png')?`<img class="hero-fragment fragment-${name}" src="/hero-layers/${asset}" alt="" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">`:`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">${asset==='shape'?'':asset}</span>`).join('')}</div>
   </section>
-  <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>先選分類，再跳到角色</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
-  <div class="character-showcase"><aside class="avatar-rail" aria-label="目前分類角色索引">${cards.map(([id,name])=>`<a href="#show-${id}" title="${name}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</aside>
-  <div class="portrait-stories">${cards.map(([id,name,en,tags],index)=>`<article class="portrait-story" id="show-${id}"><div class="story-number">${String(index+1).padStart(2,'0')}</div><div class="story-copy"><a href="#character/${id}"><h3>${name}</h3></a><p>${en}</p></div><a class="story-figure" href="#character/${id}" aria-label="${name}">${portrait(id)}</a></article>`).join('')}</div></div></section>`;
+  <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>角色檔案</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
+  <div class="character-showcase"><nav class="character-picker" aria-label="目前分類角色">${cards.map(([id,name])=>`<a href="#character/${id}" data-preview="${id}" class="${id===selected[0]?'is-active':''}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</nav>
+  <article class="character-preview" aria-live="polite"><div class="preview-art"><a class="preview-figure" href="#character/${selected[0]}" aria-label="查看 ${selected[1]} 完整資料">${portrait(selected[0])}</a></div><div class="preview-info"><small>SELECTED CHARACTER</small><h3>${selected[1]}</h3><p class="preview-en">${selected[2]}</p><p class="preview-bio">${selected[4]}</p><a class="preview-more" href="#character/${selected[0]}">完整資料與參考板</a></div></article></div></section>`;
+}
+
+function bindCharacterPreview(){
+  const picker=document.querySelector('.character-picker');
+  const preview=document.querySelector('.character-preview');
+  if(!picker||!preview)return;
+  const show=id=>{
+    const item=person(id);if(!item)return;
+    picker.querySelectorAll('[data-preview]').forEach(link=>link.classList.toggle('is-active',link.dataset.preview===id));
+    preview.querySelector('.preview-figure').href='#character/'+id;
+    preview.querySelector('.preview-figure').setAttribute('aria-label','查看 '+item[1]+' 完整資料');
+    preview.querySelector('.preview-figure').innerHTML=portrait(id);
+    preview.querySelector('h3').textContent=item[1];
+    preview.querySelector('.preview-en').textContent=item[2];
+    preview.querySelector('.preview-bio').textContent=item[4];
+    preview.querySelector('.preview-more').href='#character/'+id;
+  };
+  picker.querySelectorAll('[data-preview]').forEach(link=>{
+    link.addEventListener('mouseenter',()=>show(link.dataset.preview));
+    link.addEventListener('focus',()=>show(link.dataset.preview));
+  });
 }
 
 function bindHero(){
@@ -159,6 +181,7 @@ function render(){
   const entry=route.startsWith('character/')?person(route.split('/')[1]):null;
   app.innerHTML=entry?detail(entry):Object.hasOwn(views,route)?views[route]():home();
   bindHero();
+  bindCharacterPreview();
   bindBoard();
   if(app.querySelector(".poster"))posterSeen=true;
   for(const a of document.querySelectorAll('nav a')){
