@@ -49,14 +49,16 @@ function home(){
   if(filter<0)filter=0;
   const cards=people.filter(p=>p[3].includes(filter));
   const fragments=[
-    ['blue-field',-54,-28,-3],['crest',-18,-64,-5],['spear',-68,24,-7],['temple',58,-42,4],
-    ['athena-face',-24,18,-2],['athena-shoulder',-42,52,-4],['shield',12,70,6],['olive-left',-72,58,-9],
-    ['olive-right',56,62,8],['letter-m',24,-50,-2],['letter-y',38,-26,3],['letter-t',48,8,-2],
-    ['letter-h',60,30,2],['letter-s',72,52,6],['rubble-a',-60,74,-8],['rubble-b',70,76,7]
+    ['blue-paper','shape',-54,-28,-3],['spear','spear.png',-68,24,-7],['temple','temple-column.png',58,-42,4],
+    ['athena','athena-bust.png',-24,18,-2],['shield','round-shield.png',12,70,6],
+    ['olive-left','olive-branch.png',-72,58,-9],['olive-right','olive-branch.png',56,62,8],
+    ['rubble-left','marble-rubble.png',-60,74,-8],['rubble-right','marble-rubble.png',70,76,7],
+    ['letter-m','M',24,-50,-2],['letter-y','Y',38,-26,3],['letter-t','T',48,8,-2],
+    ['letter-h','H',60,30,2],['letter-s','S',72,52,6],['fine-line','shape',66,-18,4],['blue-chip','shape',-38,68,-5]
   ];
   return `<section class="poster ${posterSeen?"seen":""}" aria-label="MYTHS 雅典娜拼貼封面">
     <div class="hero-underlay"><img src="athena-figure.jpg" alt="雅典娜全身立像"><span>ATHENA<br><small>智慧 · 戰略 · 工藝</small></span></div>
-    <div class="hero-layers" aria-hidden="true">${fragments.map(([name,x,y,r],index)=>`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg"></span>`).join('')}</div>
+    <div class="hero-layers" aria-hidden="true">${fragments.map(([name,asset,x,y,r],index)=>asset.endsWith?.('.png')?`<img class="hero-fragment fragment-${name}" src="/hero-layers/${asset}" alt="" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">`:`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">${asset==='shape'?'':asset}</span>`).join('')}</div>
     <a class="hero-enter" href="#characters">開始探索</a>
     <p class="hero-hint">向下捲動，讓拼貼散開</p>
   </section>
