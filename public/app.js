@@ -47,24 +47,13 @@ function portrait(id){
 }
 function home(){
   if(filter<0)filter=0;
-  const cards=people.filter(p=>p[3].includes(filter));
-  const fragments=[
-    ['blue-paper','shape',-54,-28,-3],['spear','spear.png',-68,24,-7],['temple','temple-column.png',58,-42,4],
-    ['athena','athena-bust.png',-24,18,-2],['shield','round-shield.png',12,70,6],
-    ['olive-left','olive-branch.png',-72,58,-9],['olive-right','olive-branch.png',56,62,8],
-    ['rubble-left','marble-rubble.png',-60,74,-8],['rubble-right','marble-rubble.png',70,76,7],
-    ['letter-m','M',24,-50,-2],['letter-y','Y',38,-26,3],['letter-t','T',48,8,-2],
-    ['letter-h','H',60,30,2],['letter-s','S',72,52,6],['fine-line','shape',66,-18,4],['blue-chip','shape',-38,68,-5]
-  ];
+  const cards=people.filter(p=>p[3][0]===filter);
   return `<section class="poster ${posterSeen?"seen":""}" aria-label="MYTHS 雅典娜拼貼封面">
-    <div class="hero-underlay"><img src="athena-figure.jpg" alt="雅典娜全身立像"><span>ATHENA<br><small>智慧 · 戰略 · 工藝</small></span></div>
-    <div class="hero-layers" aria-hidden="true">${fragments.map(([name,asset,x,y,r],index)=>asset.endsWith?.('.png')?`<img class="hero-fragment fragment-${name}" src="/hero-layers/${asset}" alt="" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">`:`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">${asset==='shape'?'':asset}</span>`).join('')}</div>
-    <a class="hero-enter" href="#characters">開始探索</a>
-    <p class="hero-hint">向下捲動，讓拼貼散開</p>
+    <img class="hero-reference" src="/hero-myths.png" alt="MYTHS：雅典娜、希臘柱、盾牌與橄欖枝拼貼封面">
   </section>
   <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>先選分類，再跳到角色</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
   <div class="character-showcase"><aside class="avatar-rail" aria-label="目前分類角色索引">${cards.map(([id,name])=>`<a href="#show-${id}" title="${name}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</aside>
-  <div class="portrait-stories">${cards.map(([id,name,en,tags],index)=>`<article class="portrait-story" id="show-${id}"><div class="story-number">${String(index+1).padStart(2,'0')}</div><div class="story-copy"><small>${tags.map(t=>groups[t]).join(' / ')}</small><h3>${name}</h3><p>${en}</p><a href="#character/${id}">查看人物</a></div><a class="story-figure" href="#character/${id}" aria-label="查看${name}">${portrait(id)}</a></article>`).join('')}</div></div></section>`;
+  <div class="portrait-stories">${cards.map(([id,name,en,tags],index)=>`<article class="portrait-story" id="show-${id}"><div class="story-number">${String(index+1).padStart(2,'0')}</div><div class="story-copy"><small>${tags.map(t=>groups[t]).join(' / ')}</small><a href="#character/${id}"><h3>${name}</h3></a><p>${en}</p></div><a class="story-figure" href="#character/${id}" aria-label="${name}">${portrait(id)}</a></article>`).join('')}</div></div></section>`;
 }
 
 function bindHero(){
@@ -72,6 +61,7 @@ function bindHero(){
   if(!poster)return;
   const fragments=[...poster.querySelectorAll('.hero-fragment')];
   const underlay=poster.querySelector('.hero-underlay');
+  if(!fragments.length||!underlay)return;
   const update=()=>{
     const progress=Math.max(0,Math.min(1,(scrollY-40)/360));
     poster.style.setProperty('--scatter',progress);
@@ -117,7 +107,24 @@ function wardrobe(){
   <article class="card"><h3>Peplos</h3><p>布料上緣翻折後固定在肩上。畫輪廓時可以留意胸前的雙層布和側邊開口。</p></article>
   <article class="card"><h3>Himation</h3><p>矩形披布，可斜披過一肩，也能裹住雙肩。可以比較不同披法如何改變側面輪廓。</p></article>
   </div><p>${link(dressSource,'The Met · 古希臘服裝')}</p></section>
-  <section><h2>文物穿法</h2><div class="grid">${figure(starter.athena[1],"穿愛奧尼式 Chiton 的雅典娜")}${figure({...defaultCover("aphrodite"),note:"觀察貼身 Chiton 的垂墜。"+defaultCover("aphrodite").note},"穿 Chiton 的阿芙蘿黛蒂像")}</div></section><section><h2>我的服裝參考</h2><div class="grid">${(saved.wardrobe?.refs||[]).map(item=>figure(item,item.note||'希臘服裝參考')).join('')||'<p>可以加入布料、配件、穿法和服裝草圖。</p>'}</div>${editor(false)}</section>`;
+  <section><h2>文物穿法</h2><div class="grid">${figure(starter.athena[1],"穿愛奧尼式 Chiton 的雅典娜")}${figure({...defaultCover("aphrodite"),note:"觀察貼身 Chiton 的垂墜。"+defaultCover("aphrodite").note},"穿 Chiton 的阿芙蘿黛蒂像")}</div></section><section class="board-section"><h2>我的服裝參考</h2><p class="board-help">點一下畫布後直接貼上圖片（Ctrl／⌘＋V），也可以把圖片檔拖進來。拖曳圖片移動，右下角縮放，× 刪除。</p>${referenceBoard()}</section>`;
+}
+
+function boardLayout(item,index){try{const data=JSON.parse(item.note||'{}');return {x:Number(data.x)||30+(index%4)*190,y:Number(data.y)||30+Math.floor(index/4)*180,w:Number(data.w)||170,z:Number(data.z)||index+1}}catch{return {x:30+(index%4)*190,y:30+Math.floor(index/4)*180,w:170,z:index+1}}}
+function referenceBoard(){const refs=saved.wardrobe?.refs||[];return `<div class="reference-board" tabindex="0" aria-label="可自由排列的服裝參考板">${refs.map((item,index)=>{const p=boardLayout(item,index);return `<article class="board-item" data-id="${item.id}" style="left:${p.x}px;top:${p.y}px;width:${p.w}px;z-index:${p.z}"><img src="${escapeHtml(item.image)}" alt=""><button class="board-delete" data-delete="${item.id}" aria-label="刪除圖片">×</button><span class="board-resize" aria-hidden="true"></span></article>`}).join('')}<div class="board-empty">${refs.length?'':'在這裡貼上圖片'}</div></div>`}
+
+async function uploadBoardFile(file){if(!file?.type?.startsWith('image/'))return;const data=new FormData();data.set('owner','wardrobe');data.set('kind','reference');data.set('file',file,file.name||`pasted-${Date.now()}.png`);data.set('note',JSON.stringify({x:35,y:35,w:190,z:Date.now()}));const response=await fetch('/api/references',{method:'POST',body:data});if(!response.ok)throw new Error((await response.json()).error||'圖片貼上失敗');await loadSaved();render()}
+function saveBoardPosition(item){return fetch('/api/references/'+item.dataset.id,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({note:JSON.stringify({x:item.offsetLeft,y:item.offsetTop,w:item.offsetWidth,z:Number(item.style.zIndex)||1})})})}
+function bindBoard(){
+  const board=document.querySelector('.reference-board');if(!board)return;
+  board.addEventListener('paste',e=>{const file=[...e.clipboardData.items].find(x=>x.type.startsWith('image/'))?.getAsFile();if(file){e.preventDefault();uploadBoardFile(file)}});
+  board.addEventListener('dragover',e=>{e.preventDefault();board.classList.add('is-over')});
+  board.addEventListener('dragleave',()=>board.classList.remove('is-over'));
+  board.addEventListener('drop',e=>{e.preventDefault();board.classList.remove('is-over');uploadBoardFile([...e.dataTransfer.files].find(x=>x.type.startsWith('image/')))});
+  if(window.interact){
+    window.interact('.board-item').draggable({ignoreFrom:'.board-delete,.board-resize',modifiers:[window.interact.modifiers.restrictRect({restriction:'.reference-board',endOnly:true})],listeners:{start:e=>e.target.style.zIndex=String(Date.now()),move:e=>{const el=e.target;el.style.left=Math.max(0,el.offsetLeft+e.dx)+'px';el.style.top=Math.max(0,el.offsetTop+e.dy)+'px'},end:e=>saveBoardPosition(e.target)}}).resizable({edges:{right:'.board-resize',bottom:'.board-resize'},modifiers:[window.interact.modifiers.aspectRatio({ratio:'preserve'}),window.interact.modifiers.restrictSize({min:{width:80,height:60},max:{width:700,height:700}})],listeners:{move:e=>{e.target.style.width=e.rect.width+'px'},end:e=>saveBoardPosition(e.target)}});return;
+  }
+  board.querySelectorAll('.board-item').forEach(item=>item.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const resizing=e.target.classList.contains('board-resize');const startX=e.clientX,startY=e.clientY,startLeft=item.offsetLeft,startTop=item.offsetTop,startWidth=item.offsetWidth;item.setPointerCapture(e.pointerId);item.style.zIndex=String(Date.now());const move=ev=>{if(resizing)item.style.width=Math.max(80,startWidth+ev.clientX-startX)+'px';else{item.style.left=Math.max(0,startLeft+ev.clientX-startX)+'px';item.style.top=Math.max(0,startTop+ev.clientY-startY)+'px'}};const end=()=>{item.removeEventListener('pointermove',move);item.removeEventListener('pointerup',end);saveBoardPosition(item)};item.addEventListener('pointermove',move);item.addEventListener('pointerup',end)}));
 }
 function guide(){
   return `<div class="detail"><div><h1>赫米斯</h1><p>想從哪裡開始？</p><ul><li>${link('#characters','認識角色')}</li><li>${link('#timeline','沿著史詩時間線閱讀')}</li><li>${link('#relations','看人物怎麼連在一起')}</li><li>${link('#wardrobe','翻看希臘服裝參考')}</li><li>${link('#character/hermes','認識赫米斯')}</li></ul></div>${figure(saved.hermes?.cover||defaultCover('hermes'),'赫米斯')}</div>`;
@@ -141,6 +148,7 @@ function render(){
   const entry=route.startsWith('character/')?person(route.split('/')[1]):null;
   app.innerHTML=entry?detail(entry):Object.hasOwn(views,route)?views[route]():home();
   bindHero();
+  bindBoard();
   if(app.querySelector(".poster"))posterSeen=true;
   for(const a of document.querySelectorAll('nav a')){
     const active=a.getAttribute('href')==='#'+(entry?'':route);

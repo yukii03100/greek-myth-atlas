@@ -38,6 +38,9 @@ importers:
       input-otp:
         specifier: ^1.4.2
         version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      interactjs:
+        specifier: ^1.10.28
+        version: 1.10.28
       lucide-react:
         specifier: ^1.31.0
         version: 1.75.0(@types/react@19.2.14)(react@19.2.6)
@@ -1397,6 +1400,9 @@ packages:
     engines: {node: '>=20.9.0'}
     cpu: [x64]
     os: [win32]
+
+  '@interactjs/types@1.10.28':
+    resolution: {integrity: sha512-vPmu4HWmsg0Fub3BPKGk7DuozkhgVK84TVkziY47v8Uh0A14gph55/vVRaQN4oZov0lGNJNK6Jyddim2qd/4vw==}
 
   '@isaacs/nonrecursive-glob-match@1.1.0':
     resolution: {integrity: sha512-GPm/Dbvk5RLmhRnxXIa7nTpK0xtl4E0wj0MslsuNiJ1FIROU+2+9lgUC/dgF7Ey4QCWhfEsgxilMRMCdHPfDfw==}
@@ -3665,6 +3671,9 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
 
+  interactjs@1.10.28:
+    resolution: {integrity: sha512-QCa4ksTPd2p/FZ4I6hrH6fogjLqru1TxYywRiKYNuLZtrlAxTIYUa/MYsE7PnUgWZJU3SrGVDjiz065BeaXYng==}
+
   internal-slot@1.1.0:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
@@ -5798,6 +5807,8 @@ snapshots:
 
   '@img/sharp-win32-x64@0.35.5':
     optional: true
+
+  '@interactjs/types@1.10.28': {}
 
   '@isaacs/nonrecursive-glob-match@1.1.0': {}
 
@@ -8169,6 +8180,10 @@ snapshots:
     dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
+
+  interactjs@1.10.28:
+    dependencies:
+      '@interactjs/types': 1.10.28
 
   internal-slot@1.1.0:
     dependencies:
