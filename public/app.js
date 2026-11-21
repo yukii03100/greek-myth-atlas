@@ -182,17 +182,19 @@ function relationshipList(rows){
   return rows.length?'<ul>'+rows.map(([a,rel,b])=>'<li>'+personLink(a)+' <span>— '+rel+' —</span> '+personLink(b)+'</li>').join('')+'</ul>':'<p>關係待補充</p>';
 }
 function relationshipView(){
-  const nodes=[['athena',100,80],['poseidon',360,80],['odysseus',260,300],['penelope',100,520],['telemachus',380,520],['polyphemus',520,270],['agamemnon',670,80],['achilles',770,260],['patroclus',660,520],['hector',900,500]];
+  const nodes=[['zeus',600,70],['hera',780,70],['hermes',400,200],['apollo',600,220],['athena',180,210],['poseidon',930,210],['odysseus',360,450],['penelope',160,700],['telemachus',440,720],['polyphemus',700,450],['agamemnon',820,570],['achilles',1010,590],['patroclus',860,800],['hector',1130,790]];
   const edges=[
-    ['athena','odysseus','協助返鄉','support',100,80,260,300],['poseidon','odysseus','阻撓返鄉','conflict',360,80,260,300],
-    ['poseidon','polyphemus','父子','family',360,80,520,270],['odysseus','penelope','夫妻','spouse',260,300,100,520],
-    ['odysseus','telemachus','父子','family',260,300,380,520],['penelope','telemachus','母子','family',100,520,380,520],
-    ['agamemnon','achilles','爭執','conflict',670,80,770,260],['achilles','patroclus','親近戰友','support',770,260,660,520],
-    ['achilles','hector','對手','conflict',770,260,900,500]
+    ['zeus','hera','夫妻','spouse',600,70,780,70],['zeus','athena','父女','family',600,70,180,210],
+    ['zeus','hermes','父子','family',600,70,400,200],['zeus','apollo','父子','family',600,70,600,220],
+    ['zeus','poseidon','兄弟','family',600,70,930,210],['athena','odysseus','協助返鄉','support',180,210,360,450],
+    ['poseidon','odysseus','阻撓返鄉','conflict',930,210,360,450],['poseidon','polyphemus','父子','family',930,210,700,450],
+    ['odysseus','penelope','夫妻','spouse',360,450,160,700],['odysseus','telemachus','父子','family',360,450,440,720],
+    ['penelope','telemachus','母子','family',160,700,440,720],['agamemnon','achilles','爭執','conflict',820,570,1010,590],
+    ['achilles','patroclus','親近戰友','support',1010,590,860,800],['achilles','hector','對手','conflict',1010,590,1130,790]
   ];
   const edge=([a,b,label,type,x1,y1,x2,y2])=>`<g class="relation-edge ${type}" data-people="${a} ${b}">${type==='spouse'?`<line x1="${x1}" y1="${y1-3}" x2="${x2}" y2="${y2-3}"/><line x1="${x1}" y1="${y1+3}" x2="${x2}" y2="${y2+3}"/>`:`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`}<text x="${(x1+x2)/2}" y="${(y1+y2)/2-8}">${escapeHtml(label)}</text></g>`;
-  const node=([id,x,y])=>{const p=person(id);return `<a class="map-node" data-person="${id}" href="#character/${id}" style="left:${x/10}%;top:${y/6.5}%"><span>${portrait(id)}</span><b>${p[1]}</b><small>${p[2]}</small></a>`};
-  return '<div class="diagram-heading"><div><small>CHARACTER CONNECTIONS</small><h1>關係線</h1><p>每位人物只出現一次，以線型表示不同關係。</p></div></div><div class="relation-legend"><span class="family">親屬</span><span class="spouse">夫妻</span><span class="support">協助／同盟</span><span class="conflict">衝突／對立</span></div><div class="relation-map-shell"><section class="relation-map"><svg viewBox="0 0 1000 650" aria-hidden="true">'+edges.map(edge).join('')+'</svg>'+nodes.map(node).join('')+'</section></div>';
+  const node=([id,x,y])=>{const p=person(id);return `<a class="map-node" data-person="${id}" href="#character/${id}" style="left:${x/12}%;top:${y/8.5}%"><span>${portrait(id)}</span><b>${p[1]}</b><small>${p[2]}</small></a>`};
+  return '<div class="diagram-heading"><div><small>CHARACTER CONNECTIONS</small><h1>關係線</h1><p>上層為眾神，下層連到史詩人物；每位人物只出現一次。</p></div></div><div class="relation-legend"><span class="family">親屬</span><span class="spouse">夫妻</span><span class="support">協助／同盟</span><span class="conflict">衝突／對立</span></div><div class="relation-map-shell"><section class="relation-map gods-map"><svg viewBox="0 0 1200 850" aria-hidden="true">'+edges.map(edge).join('')+'</svg>'+nodes.map(node).join('')+'</section></div>';
 }
 
 function bindRelationMap(){
