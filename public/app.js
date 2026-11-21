@@ -9,6 +9,7 @@ const volume=(work,n)=>link(book(work,n),'第 '+n+' 卷');
 const starter={athena:[{image:'athena-detail.jpg',note:'頭盔輪廓與衣褶。羅馬時期大理石雅典娜像細節。',source:met},{image:'athena-armored-figure.jpg',note:'穿愛奧尼式 Chiton 的青銅雅典娜。',source:'https://www.metmuseum.org/art/collection/search/244457'}],odysseus:[{image:'odysseus.jpg',note:'陶壺上的弓箭手，可能是奧德修斯。',source:'https://www.metmuseum.org/art/collection/search/251485'}]};
 let filter=-1;
 let focusPerson='athena';
+let relationGroup=0;
 let posterSeen=false;
 const metObject=id=>'https://www.metmuseum.org/art/collection/search/'+id;
 const commons=name=>'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(name);
@@ -182,9 +183,10 @@ function relationshipList(rows){
   return rows.length?'<ul>'+rows.map(([a,rel,b])=>'<li>'+personLink(a)+' <span>— '+rel+' —</span> '+personLink(b)+'</li>').join('')+'</ul>':'<p>關係待補充</p>';
 }
 function relationshipView(){
-  const rows=relations.filter(([a,_,b])=>a===focusPerson||b===focusPerson);
-  const current=person(focusPerson);
-  return '<div class="diagram-heading"><div><small>CHARACTER CONNECTIONS</small><h1>關係線</h1><p>選一位角色，只顯示與他直接相關的分支。</p></div><label class="pivot">查看人物<select id="pivot">'+people.map(([id,name])=>'<option value="'+id+'"'+(id===focusPerson?' selected':'')+'>'+name+'</option>').join('')+'</select></label></div><section class="relation-tree"><a class="relation-root" href="#character/'+focusPerson+'"><span>'+portrait(focusPerson)+'</span><b>'+current[1]+'</b><small>'+current[2]+'</small></a>'+(rows.length?'<div class="relation-branches">'+rows.map(([a,rel,b])=>{const other=a===focusPerson?b:a,p=person(other);return '<article class="relation-branch"><span class="relation-label">'+escapeHtml(rel)+'</span><a href="#character/'+other+'"><span>'+portrait(other)+'</span><b>'+p[1]+'</b><small>'+p[2]+'</small></a></article>'}).join('')+'</div>':'<p class="relation-empty">關係待補充</p>')+'</section>';
+  const godIds=new Set(people.filter(p=>p[3][0]===0).map(p=>p[0]));
+  const rows=relations.filter(([a,_,b])=>relationGroup===0?(godIds.has(a)||godIds.has(b)):(!godIds.has(a)&&!godIds.has(b)));
+  const node=id=>{const p=person(id);return '<a class="pair-node" href="#character/'+id+'"><span>'+portrait(id)+'</span><b>'+p[1]+'</b><small>'+p[2]+'</small></a>'};
+  return '<div class="diagram-heading"><div><small>CHARACTER CONNECTIONS</small><h1>關係線</h1><p>只保留兩個大類與主要關係。</p></div></div><div class="relation-groups"><button data-relation-group="0" aria-pressed="'+(relationGroup===0)+'">眾神</button><button data-relation-group="1" aria-pressed="'+(relationGroup===1)+'">其他</button></div><section class="relation-pairs">'+rows.map(([a,rel,b])=>'<article class="relation-pair">'+node(a)+'<div class="pair-line"><span>'+escapeHtml(rel)+'</span></div>'+node(b)+'</article>').join('')+'</section>';
 }
 function timeline(){
   return '<div class="diagram-heading"><div><small>EPIC SEQUENCE</small><h1>時間線</h1><p>依故事順序整理成兩條簡化主線，卷數可連到史詩英譯。</p></div></div><div class="epic-timelines">'+[1,2].map(work=>'<section class="epic-line"><header><span>0'+work+'</span><h2>'+groups[work]+'</h2></header><div class="timeline-track">'+events.filter(([w])=>w===work).map(([w,n,summary],index)=>'<article class="timeline-event" style="--event:'+index+'"><small>'+volume(w,n)+'</small><p>'+escapeHtml(summary)+'</p></article>').join('')+'</div></section>').join('')+'</div>';
@@ -233,6 +235,7 @@ async function saveImage(e,id){
 app.addEventListener('click',e=>{
   const del=e.target.closest('[data-delete]');if(del){if(confirm('確定刪除這張圖與筆記？'))fetch('/api/references/'+del.dataset.delete,{method:'DELETE'}).then(loadSaved).then(render);return}
   const edit=e.target.closest('[data-edit]');if(edit){const item=Object.values(saved).flatMap(x=>[x.cover,...x.refs].filter(Boolean)).find(x=>x.id===edit.dataset.edit);if(!item)return;const note=prompt('修改筆記',item.note||'');if(note===null)return;const source=prompt('修改來源連結',item.source||'');if(source===null)return;const license=prompt('修改授權資訊',item.license||'');if(license===null)return;fetch('/api/references/'+item.id,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({note,source,license})}).then(loadSaved).then(render);return}
+  const relationButton=e.target.closest('[data-relation-group]');if(relationButton){relationGroup=Number(relationButton.dataset.relationGroup);render();return}
   const button=e.target.closest('[data-filter]');
   if(!button)return;
   filter=Number(button.dataset.filter);
