@@ -136,12 +136,19 @@ const figureResearch={
   agamemnon:['希臘國家美術館 · 阿伽門農群像','https://www.nationalgallery.gr/en/artwork/agamemnon-clytemnestra-and-aegisthus/']
 };
 const dressSource='https://www.metmuseum.org/essays/ancient-greek-dress';
+const dressRefs=[
+  ['古希臘女裝圖解','https://michelleninglo.pixnet.net/blog/posts/8068757430','女裝輪廓、布料垂墜與披裹方式的視覺參考。'],
+  ['古希臘服裝圖解','https://michelleninglo.pixnet.net/blog/posts/8068774766','搭配前篇閱讀，觀察男女服裝的比例、固定位置與外輪廓。'],
+  ['古希臘服裝整理','https://zhuanlan.zhihu.com/p/702016822','補充 Doric／Ionic Chiton、Peplos、Himation 與 Chlamys 的穿法差異。']
+];
 function wardrobe(){
   return `<h1>希臘服裝參考</h1><section><h2>服裝結構</h2><div class="grid">
   <article class="card"><h3>Chiton</h3><p>在肩部固定、腰部束帶。畫衣褶可以從肩扣、腰帶和布料垂下的方向開始。</p></article>
   <article class="card"><h3>Peplos</h3><p>布料上緣翻折後固定在肩上。畫輪廓時可以留意胸前的雙層布和側邊開口。</p></article>
   <article class="card"><h3>Himation</h3><p>矩形披布，可斜披過一肩，也能裹住雙肩。可以比較不同披法如何改變側面輪廓。</p></article>
   </div><p>${link(dressSource,'The Met · 古希臘服裝')}</p></section>
+  <section><h2>穿法拆解</h2><div class="dress-notes"><article><b>Doric Chiton／Peplos</b><p>肩部主要固定兩點，布料較厚；先看上緣翻折，再決定腰帶位置與自然垂褶。</p></article><article><b>Ionic Chiton</b><p>從肩到手臂可有多個固定點，薄布形成較密、較細的垂直褶線。</p></article><article><b>Himation／Chlamys</b><p>前者是大面積披裹外衣，後者較短，常在肩部固定；適合用來拉開角色剪影。</p></article></div></section>
+  <section><h2>你提供的服裝參考</h2><div class="dress-source-grid">${dressRefs.map(([title,url,note],index)=>`<a href="${url}" target="_blank" rel="noreferrer"><small>REFERENCE 0${index+1}</small><h3>${title}</h3><p>${note}</p><span>查看原文</span></a>`).join('')}</div></section>
   <section><h2>文物穿法</h2><div class="grid">${figure(starter.athena[1],"穿愛奧尼式 Chiton 的雅典娜")}${figure({...defaultCover("aphrodite"),note:"觀察貼身 Chiton 的垂墜。"+defaultCover("aphrodite").note},"穿 Chiton 的阿芙蘿黛蒂像")}</div></section>`;
 }
 
@@ -182,13 +189,35 @@ function relationshipList(rows){
   return rows.length?'<ul>'+rows.map(([a,rel,b])=>'<li>'+personLink(a)+' <span>— '+rel+' —</span> '+personLink(b)+'</li>').join('')+'</ul>':'<p>關係待補充</p>';
 }
 function relationshipView(){
-  const box=(id,zh,en,x,y,w=150)=>`<a class="gene-node${id?' linked':''}" ${id?`href="#character/${id}"`:''} style="--gx:${x};--gy:${y};--gw:${w}"><b>${zh}</b><small>${en}</small></a>`;
-  return `<div class="diagram-heading"><div><small>THE PRINCIPAL GODS</small><h1>眾神關係</h1><p>依你提供的神譜整理；人物只出現一次。</p></div></div>
+  const box=(id,zh,en,x,y,w=160,extra='')=>`<a class="gene-node${id?' linked':''} ${extra}" ${id?`href="#character/${id}"`:''} style="--gx:${x};--gy:${y};--gw:${w}"><b>${zh}</b><small>${en}</small></a>`;
+  return `<div class="diagram-heading"><div><small>FROM CHAOS TO OLYMPUS</small><h1>眾神關係</h1><p>從渾沌開始，沿著同一條脈絡往下閱讀；每位神只出現一次。</p></div></div>
   <div class="gene-legend"><span class="gene-double">夫妻</span><span class="gene-single">親子</span></div>
-  <div class="genealogy-shell"><section class="genealogy-map">
-    <svg viewBox="0 0 1100 720" aria-hidden="true"><g class="gene-lines"><line x1="530" y1="73" x2="645" y2="73"/><line x1="530" y1="79" x2="645" y2="79"/><path d="M588 79 V150 H150 V205 M588 150 H365 V205 M588 150 H585 V205 M588 150 H825 V205"/><line x1="440" y1="245" x2="510" y2="245"/><line x1="440" y1="251" x2="510" y2="251"/><path d="M365 285 V370 H255 V500 M365 370 H465 V500 M365 370 H685 V500 M365 370 H925 V500"/><path d="M150 285 V390 H75 V500"/></g><g class="gene-mothers"><text x="255" y="468">由宙斯而生</text><text x="465" y="468">母：瑪亞 Maia</text><text x="685" y="468">母：勒托 Leto</text><text x="925" y="468">母：狄俄涅 Dione</text><text x="75" y="468">波賽頓之子</text></g></svg>
-    ${box('', '克羅諾斯','Cronus',380,20)}${box('', '瑞亞','Rhea',645,20)}${box('poseidon','波賽頓','Poseidon',75,205)}${box('zeus','宙斯','Zeus',290,205)}${box('hera','赫拉','Hera',510,205)}${box('','狄蜜特','Demeter',750,205)}${box('polyphemus','波呂斐摩斯','Polyphemus',0,500)}${box('athena','雅典娜','Athena',180,500)}${box('hermes','赫米斯','Hermes',390,500)}${box('apollo','阿波羅','Apollo',610,500)}${box('aphrodite','阿芙蘿黛蒂','Aphrodite',850,500)}
+  <div class="genealogy-shell"><section class="genealogy-map genealogy-expanded is-waiting" id="chaosGenealogy">
+    <svg viewBox="0 0 1400 1120" aria-hidden="true"><g class="gene-lines">
+      <path d="M700 96 V160 H480 V205 M700 160 H920 V205"/>
+      <path d="M480 285 V335 H700 V365"/><path d="M920 285 V335 H700 V365"/>
+      <line x1="620" y1="408" x2="780" y2="408"/><line x1="620" y1="414" x2="780" y2="414"/>
+      <path d="M700 414 V480 H530 V525 M700 480 H870 V525"/>
+      <line x1="610" y1="568" x2="790" y2="568"/><line x1="610" y1="574" x2="790" y2="574"/>
+      <path d="M700 574 V640 H120 V700 M700 640 H350 V700 M700 640 H580 V700 M700 640 H810 V700 M700 640 H1040 V700 M700 640 H1270 V700"/>
+      <line x1="660" y1="743" x2="730" y2="743"/><line x1="660" y1="749" x2="730" y2="749"/>
+      <path d="M580 785 V850 H360 V930 M580 850 H600 V930 M580 850 H840 V930 M580 850 H1080 V930"/>
+      <path d="M350 785 V870 H120 V930"/>
+    </g><g class="gene-mothers"><text x="700" y="505">泰坦神族 · THE TITANS</text><text x="360" y="910">由宙斯而生</text><text x="600" y="910">母：瑪亞 Maia</text><text x="840" y="910">母：勒托 Leto</text><text x="1080" y="910">母：狄俄涅 Dione</text><text x="120" y="910">波賽頓之子</text></g></svg>
+    <button class="chaos-core" type="button" aria-label="展開渾沌的子嗣"><span></span><b>渾沌</b><small>CHAOS</small><em>點一下展開</em></button>
+    ${box('', '夜神耐特','Nyx · Night',390,205,180,'gene-emerge gene-delay-1')}${box('', '厄瑞玻斯','Erebus · Darkness',830,205,180,'gene-emerge gene-delay-2')}
+    ${box('', '蓋亞','Gaia',540,365,160)}${box('', '烏拉諾斯','Uranus',780,365,160)}
+    ${box('', '瑞亞','Rhea',450,525,160)}${box('', '克羅諾斯','Cronus',790,525,160)}
+    ${box('', '赫斯提亞','Hestia',40,700)}${box('poseidon','波賽頓','Poseidon',270,700)}${box('zeus','宙斯','Zeus',500,700)}${box('hera','赫拉','Hera',730,700)}${box('', '狄蜜特','Demeter',960,700)}${box('', '黑帝斯','Hades',1190,700)}
+    ${box('polyphemus','波呂斐摩斯','Polyphemus',40,930)}${box('athena','雅典娜','Athena',280,930)}${box('hermes','赫米斯','Hermes',520,930)}${box('apollo','阿波羅','Apollo',760,930)}${box('aphrodite','阿芙蘿黛蒂','Aphrodite',1000,930)}
   </section></div>`;
+}
+
+function bindChaosGenealogy(){
+  const map=document.querySelector('#chaosGenealogy');if(!map)return;
+  const reveal=()=>{if(map.classList.contains('is-revealed'))return;map.classList.remove('is-waiting');map.classList.add('is-revealed')};
+  map.querySelector('.chaos-core')?.addEventListener('click',reveal);
+  setTimeout(reveal,1500);
 }
 
 function bindRelationMap(){
@@ -200,7 +229,7 @@ function bindRelationMap(){
   });
 }
 function timeline(){
-  return '<div class="diagram-heading"><div><small>EPIC SEQUENCE</small><h1>時間線</h1><p>依故事順序整理成兩條簡化主線，卷數可連到史詩英譯。</p></div></div><div class="epic-timelines">'+[1,2].map(work=>'<section class="epic-line"><header><span>0'+work+'</span><h2>'+groups[work]+'</h2></header><div class="timeline-track">'+events.filter(([w])=>w===work).map(([w,n,summary],index)=>'<article class="timeline-event" style="--event:'+index+'"><small>'+volume(w,n)+'</small><p>'+escapeHtml(summary)+'</p></article>').join('')+'</div></section>').join('')+'</div>';
+  return '<div class="diagram-heading timeline-heading"><div><small>EPIC SEQUENCE</small><h1>時間線</h1><p>把兩部史詩各自拉成一條可橫向閱讀的大型敘事線；節點依故事順序展開。</p></div></div><div class="epic-timelines epic-expanded">'+[1,2].map(work=>'<section class="epic-line"><header><span>0'+work+'</span><div><small>EPIC</small><h2>'+groups[work]+'</h2></div></header><div class="timeline-track">'+events.filter(([w])=>w===work).map(([w,n,summary],index)=>'<article class="timeline-event" style="--event:'+index+'"><small>'+volume(w,n)+'</small><p>'+escapeHtml(summary)+'</p></article>').join('')+'</div></section>').join('')+'</div>';
 }
 function sources(){
   return `<h1>資料來源</h1><section><h2>史詩文本</h2><ul><li>${link(book(1,1),'荷馬《伊利亞德》')}</li><li>${link(book(2,1),'荷馬《奧德賽》')}</li></ul><p>各卷引用 Theoi Classical Texts Library 所收錄的英譯。站內人物簡介為繁中摘要。</p></section><section><h2>神話與圖像</h2><ul><li>${link(dressSource,"The Met · 古希臘服裝")}</li><li>${link(gods,'Theoi · 奧林帕斯諸神')}</li><li>${link(metObject(252453),'The Met · 薩第斯阿耳忒彌斯神廟石柱')}</li>${Object.entries(art).map(([id])=>'<li>'+link(defaultCover(id).source,art[id][1])+'</li>').join('')}</ul></section>`;
@@ -213,6 +242,7 @@ function render(){
   bindHero();
   bindCharacterPreview();
   bindBoard();
+  bindChaosGenealogy();
   if(app.querySelector(".poster"))posterSeen=true;
   for(const a of document.querySelectorAll('nav a')){
     const active=a.getAttribute('href')==='#'+(entry?'':route);
