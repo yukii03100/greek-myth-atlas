@@ -108,3 +108,7 @@ html,body{overflow-x:hidden}
 /* Open white character stage: no grey image plate or framing rules. */
 .character-preview{background:#fff;border:0}.preview-art{background:#fff}.preview-info{border:0}.character-picker{border-right:0}
 @media(max-width:760px){.character-picker{border-bottom:0}.preview-info{border:0}}
+
+/* Reference-board output controls */
+.board-toolbar{display:grid;grid-template-columns:1fr auto;align-items:end;gap:12px;margin:0 0 14px}.board-toolbar .board-help{margin:0}.board-toolbar>div{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.board-toolbar output{grid-column:1/-1;min-height:1.2em;color:#1738d0;font-size:.85rem}.board-toolbar button{border-color:#111}.board-toolbar button:first-child{background:#1738d0;color:#fff;border-color:#1738d0}@media(max-width:680px){.board-toolbar{grid-template-columns:1fr}.board-toolbar>div{justify-content:flex-start}.board-toolbar output{grid-column:auto}}
+@media print{@page{size:landscape;margin:10mm}body.printing-board{background:#fff}body.printing-board *{visibility:hidden!important}body.printing-board .reference-board,body.printing-board .reference-board *{visibility:visible!important}body.printing-board .reference-board{position:absolute;left:0;top:0;width:100%;height:calc(100vh - 20mm);min-height:0;box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}body.printing-board .board-delete,body.printing-board .board-resize,body.printing-board .board-empty{display:none!important}}

@@ -121,7 +121,7 @@ function detail([id,name,en,tags,bio,volumes]){
   const archiveRefs=[...(custom.cover&&defaultCover(id)?[defaultCover(id)]:[]),...(starter[id]||[])];
   return `<p>${link('#','← 所有角色')}</p><div class="detail"><div><small>${tags.map(index=>groups[index]).join(' · ')}</small><h1>${name}</h1><small>${en}</small>${custom.cover?'<p>我的角色設計</p>':""}</div>${cover?figure(cover,name):'<figure><figcaption>主圖待更新</figcaption></figure>'}</div>
 <section><h2>神話與史詩</h2><p>${bio}</p><p><small>${volumes.map(([w,n])=>groups[w]+' '+volume(w,n)).join(' · ')}</small></p></section>
-<section><h2>Reference</h2>${figureResearch[id]?'<p>'+link(figureResearch[id][1],figureResearch[id][0])+'</p>':""}${archiveRefs.length?`<div class="grid">${archiveRefs.map(item=>figure(item,item.note||name+'參考圖')).join('')}</div>`:''}<p class="board-help">點一下畫布後直接貼上圖片（Ctrl／⌘＋V），或把圖片檔拖進來。圖片、位置與尺寸會自動保存。</p>${referenceBoard(id,name)}</section>
+<section class="board-section"><h2>Reference</h2>${figureResearch[id]?'<p>'+link(figureResearch[id][1],figureResearch[id][0])+'</p>':""}${archiveRefs.length?`<div class="grid">${archiveRefs.map(item=>figure(item,item.note||name+'參考圖')).join('')}</div>`:''}<div class="board-toolbar"><p class="board-help">點一下畫布後直接貼上圖片（Ctrl／⌘＋V），或把圖片檔拖進來。圖片、位置與尺寸會自動保存。</p><div><button type="button" data-export-board>匯出 PNG</button><button type="button" data-print-board>列印／存成 PDF</button></div><output aria-live="polite"></output></div>${referenceBoard(id,name)}</section>
 <section><h2>相關人物</h2>${relationshipList(relations.filter(([a,_,b])=>a===id||b===id))}</section>`;
 }
 function editor(cover){
@@ -150,9 +150,22 @@ function referenceBoard(owner,name){const refs=saved[owner]?.refs||[];return `<d
 
 async function uploadBoardFile(file,owner){if(!file?.type?.startsWith('image/'))return;const data=new FormData();data.set('owner',owner);data.set('kind','reference');data.set('file',file,file.name||`pasted-${Date.now()}.png`);data.set('note',JSON.stringify({x:35,y:35,w:190,z:Date.now()}));const response=await fetch('/api/references',{method:'POST',body:data});if(!response.ok)throw new Error((await response.json()).error||'圖片貼上失敗');await loadSaved();render()}
 function saveBoardPosition(item){return fetch('/api/references/'+item.dataset.id,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({note:JSON.stringify({x:item.offsetLeft,y:item.offsetTop,w:item.offsetWidth,z:Number(item.style.zIndex)||1})})})}
+async function exportReferenceBoard(board,status){
+  const scale=2,canvas=document.createElement('canvas');canvas.width=board.clientWidth*scale;canvas.height=board.clientHeight*scale;
+  const context=canvas.getContext('2d');context.scale(scale,scale);context.fillStyle='#191919';context.fillRect(0,0,board.clientWidth,board.clientHeight);
+  const items=[...board.querySelectorAll('.board-item')].sort((a,b)=>(Number(a.style.zIndex)||0)-(Number(b.style.zIndex)||0));
+  try{
+    for(const item of items){const image=item.querySelector('img');if(!image.complete)await image.decode();context.drawImage(image,item.offsetLeft,item.offsetTop,item.offsetWidth,item.offsetHeight)}
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('無法建立圖片')),'image/png'));
+    const url=URL.createObjectURL(blob),download=document.createElement('a');download.href=url;download.download=`${board.dataset.owner}-reference-board.png`;download.click();setTimeout(()=>URL.revokeObjectURL(url),1000);status.textContent='PNG 已匯出。';
+  }catch(error){status.textContent='有圖片來源不允許輸出，請先下載後再貼到畫布。'}
+}
 function bindBoard(){
   const board=document.querySelector('.reference-board');if(!board)return;
   const owner=board.dataset.owner;
+  const toolbar=document.querySelector('.board-toolbar'),status=toolbar?.querySelector('output');
+  toolbar?.querySelector('[data-export-board]')?.addEventListener('click',()=>exportReferenceBoard(board,status));
+  toolbar?.querySelector('[data-print-board]')?.addEventListener('click',()=>{document.body.classList.add('printing-board');addEventListener('afterprint',()=>document.body.classList.remove('printing-board'),{once:true});print()});
   board.addEventListener('paste',e=>{const file=[...e.clipboardData.items].find(x=>x.type.startsWith('image/'))?.getAsFile();if(file){e.preventDefault();uploadBoardFile(file,owner)}});
   board.addEventListener('dragover',e=>{e.preventDefault();board.classList.add('is-over')});
   board.addEventListener('dragleave',()=>board.classList.remove('is-over'));
