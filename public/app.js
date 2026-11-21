@@ -182,19 +182,13 @@ function relationshipList(rows){
   return rows.length?'<ul>'+rows.map(([a,rel,b])=>'<li>'+personLink(a)+' <span>— '+rel+' —</span> '+personLink(b)+'</li>').join('')+'</ul>':'<p>關係待補充</p>';
 }
 function relationshipView(){
-  const nodes=[['zeus',600,70],['hera',780,70],['hermes',400,200],['apollo',600,220],['athena',180,210],['poseidon',930,210],['odysseus',360,450],['penelope',160,700],['telemachus',440,720],['polyphemus',700,450],['agamemnon',820,570],['achilles',1010,590],['patroclus',860,800],['hector',1130,790]];
-  const edges=[
-    ['zeus','hera','夫妻','spouse',600,70,780,70],['zeus','athena','父女','family',600,70,180,210],
-    ['zeus','hermes','父子','family',600,70,400,200],['zeus','apollo','父子','family',600,70,600,220],
-    ['zeus','poseidon','兄弟','family',600,70,930,210],['athena','odysseus','協助返鄉','support',180,210,360,450],
-    ['poseidon','odysseus','阻撓返鄉','conflict',930,210,360,450],['poseidon','polyphemus','父子','family',930,210,700,450],
-    ['odysseus','penelope','夫妻','spouse',360,450,160,700],['odysseus','telemachus','父子','family',360,450,440,720],
-    ['penelope','telemachus','母子','family',160,700,440,720],['agamemnon','achilles','爭執','conflict',820,570,1010,590],
-    ['achilles','patroclus','親近戰友','support',1010,590,860,800],['achilles','hector','對手','conflict',1010,590,1130,790]
-  ];
-  const edge=([a,b,label,type,x1,y1,x2,y2])=>`<g class="relation-edge ${type}" data-people="${a} ${b}">${type==='spouse'?`<line x1="${x1}" y1="${y1-3}" x2="${x2}" y2="${y2-3}"/><line x1="${x1}" y1="${y1+3}" x2="${x2}" y2="${y2+3}"/>`:`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`}<text x="${(x1+x2)/2}" y="${(y1+y2)/2-8}">${escapeHtml(label)}</text></g>`;
-  const node=([id,x,y])=>{const p=person(id);return `<a class="map-node" data-person="${id}" href="#character/${id}" style="left:${x/12}%;top:${y/8.5}%"><span>${portrait(id)}</span><b>${p[1]}</b><small>${p[2]}</small></a>`};
-  return '<div class="diagram-heading"><div><small>CHARACTER CONNECTIONS</small><h1>關係線</h1><p>上層為眾神，下層連到史詩人物；每位人物只出現一次。</p></div></div><div class="relation-legend"><span class="family">親屬</span><span class="spouse">夫妻</span><span class="support">協助／同盟</span><span class="conflict">衝突／對立</span></div><div class="relation-map-shell"><section class="relation-map gods-map"><svg viewBox="0 0 1200 850" aria-hidden="true">'+edges.map(edge).join('')+'</svg>'+nodes.map(node).join('')+'</section></div>';
+  const box=(id,zh,en,x,y,w=150)=>`<a class="gene-node${id?' linked':''}" ${id?`href="#character/${id}"`:''} style="--gx:${x};--gy:${y};--gw:${w}"><b>${zh}</b><small>${en}</small></a>`;
+  return `<div class="diagram-heading"><div><small>THE PRINCIPAL GODS</small><h1>眾神關係</h1><p>依你提供的神譜整理；人物只出現一次。</p></div></div>
+  <div class="gene-legend"><span class="gene-double">夫妻</span><span class="gene-single">親子</span></div>
+  <div class="genealogy-shell"><section class="genealogy-map">
+    <svg viewBox="0 0 1100 720" aria-hidden="true"><g class="gene-lines"><line x1="530" y1="73" x2="645" y2="73"/><line x1="530" y1="79" x2="645" y2="79"/><path d="M588 79 V150 H150 V205 M588 150 H365 V205 M588 150 H585 V205 M588 150 H825 V205"/><line x1="440" y1="245" x2="510" y2="245"/><line x1="440" y1="251" x2="510" y2="251"/><path d="M365 285 V370 H255 V500 M365 370 H465 V500 M365 370 H685 V500 M365 370 H925 V500"/><path d="M150 285 V390 H75 V500"/></g><g class="gene-mothers"><text x="255" y="468">由宙斯而生</text><text x="465" y="468">母：瑪亞 Maia</text><text x="685" y="468">母：勒托 Leto</text><text x="925" y="468">母：狄俄涅 Dione</text><text x="75" y="468">波賽頓之子</text></g></svg>
+    ${box('', '克羅諾斯','Cronus',380,20)}${box('', '瑞亞','Rhea',645,20)}${box('poseidon','波賽頓','Poseidon',75,205)}${box('zeus','宙斯','Zeus',290,205)}${box('hera','赫拉','Hera',510,205)}${box('','狄蜜特','Demeter',750,205)}${box('polyphemus','波呂斐摩斯','Polyphemus',0,500)}${box('athena','雅典娜','Athena',180,500)}${box('hermes','赫米斯','Hermes',390,500)}${box('apollo','阿波羅','Apollo',610,500)}${box('aphrodite','阿芙蘿黛蒂','Aphrodite',850,500)}
+  </section></div>`;
 }
 
 function bindRelationMap(){
@@ -218,7 +212,6 @@ function render(){
   app.innerHTML=entry?detail(entry):Object.hasOwn(views,route)?views[route]():home();
   bindHero();
   bindCharacterPreview();
-  bindRelationMap();
   bindBoard();
   if(app.querySelector(".poster"))posterSeen=true;
   for(const a of document.querySelectorAll('nav a')){
