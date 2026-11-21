@@ -182,13 +182,26 @@ function relationshipList(rows){
   return rows.length?'<ul>'+rows.map(([a,rel,b])=>'<li>'+personLink(a)+' <span>— '+rel+' —</span> '+personLink(b)+'</li>').join('')+'</ul>':'<p>關係待補充</p>';
 }
 function relationshipView(){
-  const wanted=[
-    ['athena','協助返鄉','odysseus'],['poseidon','阻撓返鄉','odysseus'],['poseidon','父子','polyphemus'],
-    ['odysseus','夫妻','penelope'],['penelope','母子','telemachus'],
-    ['agamemnon','爭執後分道揚鑣','achilles'],['achilles','親近戰友','patroclus'],['achilles','戰場上的對手','hector']
+  const nodes=[['athena',100,80],['poseidon',360,80],['odysseus',260,300],['penelope',100,520],['telemachus',380,520],['polyphemus',520,270],['agamemnon',670,80],['achilles',770,260],['patroclus',660,520],['hector',900,500]];
+  const edges=[
+    ['athena','odysseus','協助返鄉','support',100,80,260,300],['poseidon','odysseus','阻撓返鄉','conflict',360,80,260,300],
+    ['poseidon','polyphemus','父子','family',360,80,520,270],['odysseus','penelope','夫妻','spouse',260,300,100,520],
+    ['odysseus','telemachus','父子','family',260,300,380,520],['penelope','telemachus','母子','family',100,520,380,520],
+    ['agamemnon','achilles','爭執','conflict',670,80,770,260],['achilles','patroclus','親近戰友','support',770,260,660,520],
+    ['achilles','hector','對手','conflict',770,260,900,500]
   ];
-  const node=id=>{const p=person(id);return '<a class="pair-node" href="#character/'+id+'"><span>'+portrait(id)+'</span><b>'+p[1]+'</b><small>'+p[2]+'</small></a>'};
-  return '<div class="diagram-heading"><div><small>CHARACTER CONNECTIONS</small><h1>關係線</h1><p>沿著一條線，由上往下看主要人物關係。</p></div></div><section class="relation-pairs relation-flow">'+wanted.map(([a,rel,b])=>'<article class="relation-pair">'+node(a)+'<div class="pair-line"><span>'+escapeHtml(rel)+'</span></div>'+node(b)+'</article>').join('')+'</section>';
+  const edge=([a,b,label,type,x1,y1,x2,y2])=>`<g class="relation-edge ${type}" data-people="${a} ${b}">${type==='spouse'?`<line x1="${x1}" y1="${y1-3}" x2="${x2}" y2="${y2-3}"/><line x1="${x1}" y1="${y1+3}" x2="${x2}" y2="${y2+3}"/>`:`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`}<text x="${(x1+x2)/2}" y="${(y1+y2)/2-8}">${escapeHtml(label)}</text></g>`;
+  const node=([id,x,y])=>{const p=person(id);return `<a class="map-node" data-person="${id}" href="#character/${id}" style="left:${x/10}%;top:${y/6.5}%"><span>${portrait(id)}</span><b>${p[1]}</b><small>${p[2]}</small></a>`};
+  return '<div class="diagram-heading"><div><small>CHARACTER CONNECTIONS</small><h1>關係線</h1><p>每位人物只出現一次，以線型表示不同關係。</p></div></div><div class="relation-legend"><span class="family">親屬</span><span class="spouse">夫妻</span><span class="support">協助／同盟</span><span class="conflict">衝突／對立</span></div><div class="relation-map-shell"><section class="relation-map"><svg viewBox="0 0 1000 650" aria-hidden="true">'+edges.map(edge).join('')+'</svg>'+nodes.map(node).join('')+'</section></div>';
+}
+
+function bindRelationMap(){
+  const map=document.querySelector('.relation-map');if(!map)return;
+  const reset=()=>map.querySelectorAll('.map-node,.relation-edge').forEach(item=>item.classList.remove('is-dim','is-related'));
+  map.querySelectorAll('.map-node').forEach(node=>{
+    const show=()=>{const id=node.dataset.person;map.querySelectorAll('.map-node').forEach(item=>item.classList.toggle('is-dim',item.dataset.person!==id&&!map.querySelector(`.relation-edge[data-people~="${id}"][data-people~="${item.dataset.person}"]`)));map.querySelectorAll('.relation-edge').forEach(item=>{const related=item.dataset.people.split(' ').includes(id);item.classList.toggle('is-related',related);item.classList.toggle('is-dim',!related)})};
+    node.addEventListener('mouseenter',show);node.addEventListener('focus',show);node.addEventListener('mouseleave',reset);node.addEventListener('blur',reset);
+  });
 }
 function timeline(){
   return '<div class="diagram-heading"><div><small>EPIC SEQUENCE</small><h1>時間線</h1><p>依故事順序整理成兩條簡化主線，卷數可連到史詩英譯。</p></div></div><div class="epic-timelines">'+[1,2].map(work=>'<section class="epic-line"><header><span>0'+work+'</span><h2>'+groups[work]+'</h2></header><div class="timeline-track">'+events.filter(([w])=>w===work).map(([w,n,summary],index)=>'<article class="timeline-event" style="--event:'+index+'"><small>'+volume(w,n)+'</small><p>'+escapeHtml(summary)+'</p></article>').join('')+'</div></section>').join('')+'</div>';
@@ -203,6 +216,7 @@ function render(){
   app.innerHTML=entry?detail(entry):Object.hasOwn(views,route)?views[route]():home();
   bindHero();
   bindCharacterPreview();
+  bindRelationMap();
   bindBoard();
   if(app.querySelector(".poster"))posterSeen=true;
   for(const a of document.querySelectorAll('nav a')){
