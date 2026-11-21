@@ -216,7 +216,10 @@ function relationshipView(){
 
 function bindChaosGenealogy(){
   const gate=document.querySelector('#chaosGate'),panel=document.querySelector('#genealogyPanel');if(!gate||!panel)return;
-  gate.querySelector('button')?.addEventListener('click',()=>{gate.classList.add('is-opening');setTimeout(()=>{gate.hidden=true;panel.hidden=false;panel.classList.add('is-revealed');panel.scrollIntoView({behavior:'smooth',block:'start'})},650)});
+  const shell=panel.querySelector('.genealogy-shell'),map=panel.querySelector('.genealogy-map');
+  const fit=()=>{if(!shell||!map||panel.hidden)return;const scale=Math.min(1,shell.clientWidth/1400);map.style.transform=`scale(${scale})`;shell.style.height=Math.ceil(1120*scale)+'px'};
+  if(shell&&window.ResizeObserver)new ResizeObserver(fit).observe(shell);
+  gate.querySelector('button')?.addEventListener('click',()=>{gate.classList.add('is-opening');setTimeout(()=>{gate.hidden=true;panel.hidden=false;panel.classList.add('is-revealed');requestAnimationFrame(()=>{fit();panel.scrollIntoView({behavior:'smooth',block:'start'})})},650)});
 }
 
 function bindRelationMap(){
