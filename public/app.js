@@ -77,7 +77,7 @@ function home(){
       <img class="s-vine-real vine-front" src="/s-vine-real.png" alt="" aria-hidden="true">
     </div>
   </section>
-  <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>角色檔案</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
+  <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>角色檔案</h2></div><form id="character-search" class="character-search"><label for="character-query">搜尋角色</label><input id="character-query" list="character-options" placeholder="輸入中文或英文名字"><datalist id="character-options">${people.map(([,name,en])=>`<option value="${escapeHtml(name)}">${escapeHtml(en)}</option>`).join('')}</datalist><button>前往</button></form><div class="filters">${groups.slice(0,3).map((g,i)=>`<button type="button" data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
   <div class="character-showcase"><nav class="character-picker" aria-label="目前分類角色">${cards.map(([id,name])=>`<a href="#character/${id}" data-preview="${id}" class="${id===selected[0]?'is-active':''}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</nav>
   <article class="character-preview is-changing" aria-live="polite"><div class="preview-art"><a class="preview-figure" href="#character/${selected[0]}" aria-label="查看 ${selected[1]} 完整資料">${portrait(selected[0])}</a></div><div class="preview-info"><small>SELECTED CHARACTER</small><h3>${animatedName(selected[1])}</h3><p class="preview-en">${selected[2]}</p><p class="preview-bio">${selected[4]}</p></div></article></div></section>`;
 }
@@ -118,12 +118,13 @@ function bindHero(){
   poster.addEventListener('pointermove',move);
   poster.addEventListener('pointerleave',()=>title?.querySelectorAll('.blur-mask-circle,.sharp-mask-circle').forEach(circle=>{circle.setAttribute('cx','-100');circle.setAttribute('cy','-100')}));
 }
-function detail([id,name,en,tags,bio,volumes]){
+function detail([id,name,en,tags,bio,volumes,source]){
   const custom=saved[id]||{refs:[]};
   const cover=custom.cover||defaultCover(id);
   const archiveRefs=[...(custom.cover&&defaultCover(id)?[defaultCover(id)]:[]),...(starter[id]||[])];
   return `<p>${link('#','← 所有角色')}</p><div class="detail"><div><small>${tags.map(index=>groups[index]).join(' · ')}</small><h1>${name}</h1><small>${en}</small>${custom.cover?'<p>我的角色設計</p>':""}</div>${cover?figure(cover,name):'<figure><figcaption>主圖待更新</figcaption></figure>'}</div>
-<section><h2>神話與史詩</h2><p>${bio}</p><p><small>${volumes.map(([w,n])=>groups[w]+' '+volume(w,n)).join(' · ')}</small></p></section>
+<section><h2>神話與史詩</h2><p>${bio}</p><p><small>${volumes.map(([w,n])=>groups[w]+' '+volume(w,n)).join(' · ')}</small></p>${source?`<p>${link(source,'Theoi 完整人物條目與古典文獻引文')}</p>`:''}</section>
+<section class="notes-panel"><h2>創作筆記</h2><p>筆記只儲存在這台裝置，可隨時匯出備份。</p><textarea data-character-note="${id}" rows="8" placeholder="記錄造型、性格、情節、構圖或待查資料……"></textarea><div><button type="button" data-save-note>儲存筆記</button><button type="button" data-export-note>匯出文字檔</button><output aria-live="polite"></output></div></section>
 <section class="board-section"><h2>Reference</h2>${figureResearch[id]?'<p>'+link(figureResearch[id][1],figureResearch[id][0])+'</p>':""}${archiveRefs.length?`<div class="grid">${archiveRefs.map(item=>figure(item,item.note||name+'參考圖')).join('')}</div>`:''}<div class="board-toolbar"><p class="board-help">點一下畫布後直接貼上圖片（Ctrl／⌘＋V），或把圖片檔拖進來。圖片、位置與尺寸會自動保存。</p><div><button type="button" data-export-board>匯出 PNG</button><button type="button" data-print-board>列印／存成 PDF</button></div><output aria-live="polite"></output></div>${referenceBoard(id,name)}</section>
 <section><h2>相關人物</h2>${relationshipList(relations.filter(([a,_,b])=>a===id||b===id))}</section>`;
 }
@@ -233,16 +234,30 @@ function timeline(){
   return '<div class="diagram-heading"><div><small>EPIC SEQUENCE</small><h1>時間線</h1><p>依故事順序整理成兩條清楚主線，卷數可連到史詩英譯。</p></div></div><div class="epic-timelines">'+[1,2].map(work=>'<section class="epic-line"><header><h2>'+groups[work]+'</h2></header><div class="timeline-track">'+events.filter(([w])=>w===work).map(([w,n,summary],index)=>'<article class="timeline-event" style="--event:'+index+'"><small>'+volume(w,n)+'</small><p>'+escapeHtml(summary)+'</p></article>').join('')+'</div></section>').join('')+'</div>';
 }
 function sources(){
-  return `<h1>資料來源</h1><section><h2>史詩文本</h2><ul><li>${link(book(1,1),'荷馬《伊利亞德》')}</li><li>${link(book(2,1),'荷馬《奧德賽》')}</li></ul><p>各卷引用 Theoi Classical Texts Library 所收錄的英譯。站內人物簡介為繁中摘要。</p></section><section><h2>服裝資料與圖像</h2><ul><li>${link(dressSource,"The Met · 古希臘服裝")}</li>${dressRefs.map(([title,url])=>`<li>${link(url,title)} · 服裝圖解與穿法參考</li>`).join('')}</ul></section><section><h2>神話與角色圖像</h2><ul><li>${link(gods,'Theoi · 奧林帕斯諸神')}</li><li>${link(metObject(252453),'The Met · 薩第斯阿耳忒彌斯神廟石柱')}</li>${Object.entries(art).map(([id])=>'<li>'+link(defaultCover(id).source,art[id][1])+'</li>').join('')}</ul></section>`;
+  const characterSources=people.filter(row=>row[6]).map(row=>`<li>${link(row[6],row[1]+' '+row[2])}</li>`).join('');
+  return `<h1>資料來源</h1><section><h2>神話百科與譜系</h2><ul><li>${link('https://www.theoi.com/Tree.html','Theoi · Greek Gods Family Tree')}</li><li>${link('https://www.theoi.com/TreeKey.html','Theoi · 關係圖閱讀方式與資料說明')}</li><li>${link(gods,'Theoi · 奧林帕斯諸神')}</li></ul><p>人物資料以 Theoi 的分類、譜系與古典文獻引文為主要索引；站內文字為繁中摘要，並保留每位角色的原始條目連結。</p></section><section><h2>人物條目</h2><ul class="source-columns">${characterSources}</ul></section><section><h2>史詩文本</h2><ul><li>${link(book(1,1),'荷馬《伊利亞德》')}</li><li>${link(book(2,1),'荷馬《奧德賽》')}</li></ul><p>各卷引用 Theoi Classical Texts Library 所收錄的英譯。</p></section><section><h2>服裝資料與圖像</h2><ul><li>${link(dressSource,"The Met · 古希臘服裝")}</li>${dressRefs.map(([title,url])=>`<li>${link(url,title)} · 服裝圖解與穿法參考</li>`).join('')}</ul></section><section><h2>角色圖像</h2><ul><li>${link(metObject(252453),'The Met · 薩第斯阿耳忒彌斯神廟石柱')}</li>${Object.entries(art).map(([id])=>'<li>'+link(defaultCover(id).source,art[id][1])+'</li>').join('')}</ul></section>`;
 }
+function studio(){
+  const items=people.map(([id,name,en])=>{const note=localStorage.getItem('myths-note-'+id);return note?`<article><h3>${name} <small>${en}</small></h3><p>${escapeHtml(note).replace(/\n/g,'<br>')}</p><a href="#character/${id}">繼續編輯</a></article>`:''}).filter(Boolean).join('');
+  return `<h1>創作工作區</h1><section><p>這裡集中顯示各角色頁已儲存的創作筆記。參考圖片仍在每個角色的 Reference 畫布管理。</p><div class="studio-toolbar"><button type="button" data-export-all-notes>匯出全部筆記 JSON</button></div><div class="note-index">${items||'<p>目前沒有筆記。請先進入任一角色頁新增。</p>'}</div></section>`;
+}
+function bindNotes(){
+  const area=document.querySelector('[data-character-note]');
+  if(area){const key='myths-note-'+area.dataset.characterNote;area.value=localStorage.getItem(key)||'';document.querySelector('[data-save-note]')?.addEventListener('click',()=>{localStorage.setItem(key,area.value);const out=area.parentElement.querySelector('output');out.textContent='已儲存。'});document.querySelector('[data-export-note]')?.addEventListener('click',()=>downloadText(area.dataset.characterNote+'-notes.txt',area.value));}
+  document.querySelector('[data-export-all-notes]')?.addEventListener('click',()=>{const notes={};people.forEach(([id,name])=>{const value=localStorage.getItem('myths-note-'+id);if(value)notes[id]={name,note:value}});downloadText('myths-character-notes.json',JSON.stringify(notes,null,2),'application/json')});
+}
+function downloadText(name,text,type='text/plain'){const blob=new Blob([text],{type:type+';charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function bindCharacterSearch(){document.querySelector('#character-search')?.addEventListener('submit',e=>{e.preventDefault();const value=e.currentTarget.querySelector('input').value.trim().toLowerCase();const hit=people.find(([,name,en])=>name.includes(value)||en.toLowerCase().includes(value));if(hit)location.hash='character/'+hit[0];else alert('找不到這個角色。')})}
 function render(){
   const route=location.hash.slice(1);
-  const views={wardrobe,guide,timeline,relations:relationshipView,sources,studio:()=>'<h1>我流角色互動</h1><p>待更新</p>'};
+  const views={wardrobe,guide,timeline,relations:relationshipView,sources,studio};
   const entry=route.startsWith('character/')?person(route.split('/')[1]):null;
   app.innerHTML=entry?detail(entry):Object.hasOwn(views,route)?views[route]():home();
   bindHero();
   bindCharacterPreview();
   bindBoard();
+  bindNotes();
+  bindCharacterSearch();
   bindChaosGenealogy();
   if(app.querySelector(".poster"))posterSeen=true;
   for(const a of document.querySelectorAll('nav a')){

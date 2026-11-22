@@ -10,6 +10,21 @@ export const people=[
 ['apollo','阿波羅','Apollo',[0,1],'掌管預言、音樂與弓箭的神。《伊利亞德》開篇，他應祭司的祈禱，以瘟疫懲罰希臘聯軍。',[[1,1],[1,22]]],
 ['poseidon','波賽頓','Poseidon',[0,2],'掌管海洋與地震的神。奧德修斯刺瞎他的兒子波呂斐摩斯後，他阻撓奧德修斯返鄉。',[[2,1],[2,9]]],
 ['aphrodite','阿芙蘿黛蒂','Aphrodite',[0,1],'愛與美的女神。《伊利亞德》中，帕里斯與墨涅拉俄斯單挑時，她把帕里斯從戰場救走。',[[1,3]]],
+['demeter','狄蜜特','Demeter',[0],'穀物、農耕與豐饒女神，也是珀耳塞福涅之母。女兒被帶往冥界後，她使大地停止生長，形成季節循環的核心神話。',[],'https://www.theoi.com/Olympios/Demeter.html'],
+['ares','阿瑞斯','Ares',[0,1],'代表戰爭中暴烈與混亂一面的神。在《伊利亞德》中多次直接投入戰場，並被雅典娜與狄俄墨得斯擊退。',[[1,5]],'https://www.theoi.com/Olympios/Ares.html'],
+['artemis','阿耳忒彌斯','Artemis',[0,1],'狩獵、荒野、少女與生育守護女神，阿波羅的孿生姊妹，常以弓箭、鹿與月亮意象辨識。',[[1,21]],'https://www.theoi.com/Olympios/Artemis.html'],
+['hephaestus','赫菲斯托斯','Hephaestus',[0,1],'火、鍛造與工匠之神，為眾神打造武器與器物；《伊利亞德》中為阿基里斯鑄造新盔甲與盾牌。',[[1,18]],'https://www.theoi.com/Olympios/Hephaistos.html'],
+['hestia','赫斯提亞','Hestia',[0],'爐灶、家庭與城邦祭火女神。她較少參與戲劇性衝突，但在家庭與公共祭儀中占有核心位置。',[],'https://www.theoi.com/Ouranios/Hestia.html'],
+['dionysus','戴歐尼修斯','Dionysus',[0],'葡萄酒、狂喜、戲劇與變形之神，常與葡萄藤、酒杯、常春藤、豹與隨從薩堤爾一同出現。',[],'https://www.theoi.com/Olympios/Dionysos.html'],
+['hades','黑帝斯','Hades',[0,2],'冥界之王，宙斯與波賽頓的兄弟，也是珀耳塞福涅的丈夫；掌管亡者國度而非死亡本身。',[[2,11]],'https://www.theoi.com/Khthonios/Haides.html'],
+['persephone','珀耳塞福涅','Persephone',[0,2],'冥界之后與春季重生女神。她往返於母親狄蜜特與冥界之間的神話，解釋了大地的枯榮循環。',[[2,11]],'https://www.theoi.com/Khthonios/Persephone.html'],
+['chaos','卡俄斯','Chaos',[0],'宇宙創生之初的裂隙或虛空。赫西俄德《神譜》以卡俄斯作為最早出現的原初存在之一。',[],'https://www.theoi.com/Protogenos/Khaos.html'],
+['nyx','倪克斯','Nyx',[0],'夜的原初女神，從卡俄斯而生；在赫西俄德譜系中，她生出睡眠、死亡、命運等多位擬人神。',[],'https://www.theoi.com/Protogenos/Nyx.html'],
+['erebus','厄瑞玻斯','Erebus',[0],'幽暗的原初神，也是冥界深處黑暗的擬人化存在；與倪克斯共同生出太空與白晝。',[],'https://www.theoi.com/Protogenos/Erebos.html'],
+['gaia','蓋亞','Gaia',[0],'大地的原初女神，生出烏拉諾斯並與其孕育泰坦、獨眼巨人與百臂巨人，是多條神祇譜系的根源。',[],'https://www.theoi.com/Protogenos/Gaia.html'],
+['uranus','烏拉諾斯','Uranus',[0],'天空的原初神，由蓋亞所生並與她結合；遭克羅諾斯推翻後，泰坦世代取得統治。',[],'https://www.theoi.com/Protogenos/Ouranos.html'],
+['cronus','克羅諾斯','Cronus',[0],'泰坦神王，推翻父親烏拉諾斯，又因預言吞下自己的子女，最後被宙斯率領的新神世代推翻。',[],'https://www.theoi.com/Titan/TitanKronos.html'],
+['rhea','瑞亞','Rhea',[0],'泰坦女神、克羅諾斯之妻，也是赫斯提亞、狄蜜特、赫拉、黑帝斯、波賽頓與宙斯之母。',[],'https://www.theoi.com/Titan/TitanisRhea.html'],
 ['achilles','阿基里斯','Achilles',[1],'希臘聯軍的戰士。他與阿伽門農決裂後退出戰鬥，直到帕特羅克洛斯戰死才重返戰場。',[[1,1],[1,16],[1,22]]],
 ['hector','赫克托耳','Hector',[1],'特洛伊王子，也是守城的主將。他殺死帕特羅克洛斯，後來在城外與阿基里斯決鬥。',[[1,6],[1,16],[1,22]]],
 ['patroclus','帕特羅克洛斯','Patroclus',[1],'阿基里斯最親近的戰友。他穿上阿基里斯的盔甲出戰，原本要救援被逼到船邊的希臘聯軍。',[[1,16]]],
@@ -38,4 +53,5 @@ export const relations=[
 ['zeus','夫妻','hera'],['achilles','親近戰友','patroclus'],['achilles','戰場上的對手','hector'],
 ['agamemnon','爭執後分道揚鑣','achilles'],['odysseus','夫妻','penelope'],['odysseus','父子','telemachus'],['penelope','母子','telemachus'],
 ['poseidon','父子','polyphemus'],['poseidon','阻撓返鄉','odysseus'],['calypso','將他留在島上','odysseus'],['circe','指引他前往冥界','odysseus']
+,[ 'chaos','生出','nyx'],['chaos','生出','erebus'],['nyx','伴侶','erebus'],['gaia','生出並結合','uranus'],['gaia','父母','cronus'],['uranus','父母','cronus'],['cronus','夫妻','rhea'],['cronus','父親','zeus'],['rhea','母親','zeus'],['cronus','父親','hera'],['rhea','母親','hera'],['cronus','父親','poseidon'],['rhea','母親','poseidon'],['cronus','父親','hades'],['rhea','母親','hades'],['demeter','母女','persephone'],['hades','夫妻','persephone'],['zeus','父女','athena'],['zeus','父子','apollo'],['zeus','父女','artemis'],['zeus','父子','ares'],['zeus','父子','hermes'],['zeus','父子','dionysus']
 ];
