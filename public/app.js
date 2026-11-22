@@ -51,15 +51,30 @@ function home(){
   const cards=people.filter(p=>p[3][0]===filter);
   const selected=cards[0];
   return `<section class="poster ${posterSeen?"seen":""}" aria-label="MYTHS 雅典娜拼貼封面">
-    <div class="hero-collage" aria-hidden="true">
-      <img class="hero-art" src="/hero-myths-serif.png" alt="">
-      <span class="hero-parallax hero-parallax-spear"></span>
-      <span class="hero-parallax hero-parallax-shield"></span>
-      <span class="hero-parallax hero-parallax-olive"></span>
+    <img class="hero-static-approval" src="/hero-static-v2.png" alt="雅典娜、神殿、盾牌、長矛、橄欖枝與 MYTHS 組成的封面拼貼">
+    <div class="hero-collage" id="heroScene" aria-hidden="true">
+      <span class="collage-layer layer-blue" data-depth="0.02"><i></i></span>
+      <span class="collage-layer layer-pediment" data-depth="0.045"><img src="/hero-assets/pediment.png" alt=""></span>
+      <span class="collage-layer layer-shield" data-depth="0.05"><img src="/hero-assets/shield.png" alt=""></span>
+      <span class="collage-layer layer-column" data-depth="0.07"><img src="/hero-assets/column.png" alt=""></span>
+      <span class="collage-layer layer-spear" data-depth="0.10"><img src="/hero-assets/spear.png" alt=""></span>
+      <span class="collage-layer layer-athena" data-depth="0.03"><img src="/hero-assets/athena.png" alt=""></span>
+      <span class="collage-layer layer-owl" data-depth="0.11"><img src="/hero-assets/owl.png" alt=""></span>
+      <span class="collage-layer fragment fragment-crest" data-depth="0.13"><img src="/hero-assets/athena.png" alt=""></span>
+      <span class="collage-layer fragment fragment-column-a" data-depth="0.15"><img src="/hero-assets/column.png" alt=""></span>
+      <span class="collage-layer fragment fragment-column-b" data-depth="0.18"><img src="/hero-assets/column.png" alt=""></span>
+      <span class="collage-layer fragment fragment-shield" data-depth="0.16"><img src="/hero-assets/shield.png" alt=""></span>
+      <span class="collage-layer layer-olive" data-depth="0.12"><img src="/hero-assets/olive.png" alt=""></span>
+      <span class="collage-layer layer-rubble" data-depth="0.14"><img src="/hero-assets/rubble.png" alt=""></span>
+      <span class="collage-layer fragment fragment-rubble" data-depth="0.2"><img src="/hero-assets/rubble.png" alt=""></span>
     </div>
     <div class="hero-title" aria-label="MYTHS">
-      <span class="hero-word" aria-hidden="true">MYTH<span class="hero-s"><span class="hero-s-letter">S</span><img class="s-vine s-vine-back" src="/s-vine-real.png" alt=""><img class="s-vine s-vine-front" src="/s-vine-real.png" alt=""></span></span>
-      <span class="hero-word-blur" aria-hidden="true">MYTHS</span>
+      <svg class="hero-type" viewBox="0 0 650 190" role="img" aria-hidden="true">
+        <defs><filter id="typeBlur" x="-12%" y="-20%" width="124%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".016 .028" numOctaves="2" seed="4" result="wave"><animate attributeName="baseFrequency" values=".013 .023;.021 .034;.013 .023" dur="1.15s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="wave" scale="7" xChannelSelector="R" yChannelSelector="G" result="shifted"><animate attributeName="scale" values="4;9;4" dur="1.15s" repeatCount="indefinite"/></feDisplacementMap><feGaussianBlur in="shifted" stdDeviation="1.45"/></filter><radialGradient id="sharpFade"><stop offset="0" stop-color="black"/><stop offset=".48" stop-color="black"/><stop offset="1" stop-color="white"/></radialGradient><radialGradient id="blurFade"><stop offset="0" stop-color="white"/><stop offset=".48" stop-color="white"/><stop offset="1" stop-color="black"/></radialGradient><mask id="cursorSharpMask"><rect width="100%" height="100%" fill="white"/><circle class="sharp-mask-circle" cx="-100" cy="-100" r="58" fill="url(#sharpFade)"/></mask><mask id="cursorBlurMask"><rect width="100%" height="100%" fill="black"/><circle class="blur-mask-circle" cx="-100" cy="-100" r="58" fill="url(#blurFade)"/></mask></defs>
+        <text class="type-base" x="8" y="145" mask="url(#cursorSharpMask)">MYTHS</text><text class="type-local-blur" x="8" y="145" filter="url(#typeBlur)" mask="url(#cursorBlurMask)">MYTHS</text>
+      </svg>
+      <img class="s-vine-real vine-back" src="/s-vine-real.png" alt="" aria-hidden="true">
+      <img class="s-vine-real vine-front" src="/s-vine-real.png" alt="" aria-hidden="true">
     </div>
   </section>
   <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>角色檔案</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
@@ -93,19 +108,15 @@ function bindCharacterPreview(){
 function bindHero(){
   const poster=document.querySelector('.poster');
   if(!poster)return;
+  const scene=poster.querySelector('#heroScene');
   const title=poster.querySelector('.hero-title');
-  const parallax=[...poster.querySelectorAll('.hero-parallax')];
+  /* Static composition approval pass: motion is re-enabled only after layout is approved. */
+  return;
   const move=e=>{
-    const rect=poster.getBoundingClientRect();
-    const x=(e.clientX-rect.left)/rect.width-.5;
-    const y=(e.clientY-rect.top)/rect.height-.5;
-    poster.style.setProperty('--mx',`${x*18}px`);
-    poster.style.setProperty('--my',`${y*14}px`);
-    parallax.forEach((layer,index)=>layer.style.transform=`translate(${x*(index+1)*7}px,${y*(index+1)*5}px) rotate(${x*(index-1)*1.2}deg)`);
-    if(title){const t=title.getBoundingClientRect();title.style.setProperty('--blur-x',`${e.clientX-t.left}px`);title.style.setProperty('--blur-y',`${e.clientY-t.top}px`)}
+    if(title){const svg=title.querySelector('.hero-type'),circles=title.querySelectorAll('.blur-mask-circle,.sharp-mask-circle');if(!svg||!circles.length)return;const point=svg.createSVGPoint();point.x=e.clientX;point.y=e.clientY;const local=point.matrixTransform(svg.getScreenCTM().inverse());circles.forEach(circle=>{circle.setAttribute('cx',local.x);circle.setAttribute('cy',local.y)})}
   };
   poster.addEventListener('pointermove',move);
-  poster.addEventListener('pointerleave',()=>{poster.style.setProperty('--mx','0px');poster.style.setProperty('--my','0px');parallax.forEach(layer=>layer.style.transform='')});
+  poster.addEventListener('pointerleave',()=>title?.querySelectorAll('.blur-mask-circle,.sharp-mask-circle').forEach(circle=>{circle.setAttribute('cx','-100');circle.setAttribute('cy','-100')}));
 }
 function detail([id,name,en,tags,bio,volumes]){
   const custom=saved[id]||{refs:[]};
@@ -182,36 +193,32 @@ function relationshipList(rows){
 }
 function relationshipView(){
   const box=(id,zh,en,x,y,w=160,extra='')=>`<a class="gene-node${id?' linked':''} ${extra}" ${id?`href="#character/${id}"`:''} style="--gx:${x};--gy:${y};--gw:${w}"><b>${zh}</b><small>${en}</small></a>`;
-  return `<section class="chaos-gate" id="chaosGate"><button type="button" aria-controls="genealogyPanel" aria-expanded="false"><span class="chaos-orbit orbit-a"></span><span class="chaos-orbit orbit-b"></span><img src="/chaos-smoke.png" alt=""><span class="chaos-void"></span><span class="chaos-copy"><b>渾沌</b><small>CHAOS</small><em>點擊進入眾神關係</em></span><span class="chaos-child child-left" aria-hidden="true"><i class="head"></i><i class="body"></i><i class="arm arm-a"></i><i class="arm arm-b"></i><i class="leg leg-a"></i><i class="leg leg-b"></i></span><span class="chaos-child child-right" aria-hidden="true"><i class="head"></i><i class="body"></i><i class="arm arm-a"></i><i class="arm arm-b"></i><i class="leg leg-a"></i><i class="leg leg-b"></i></span></button></section>
+  return `<section class="chaos-gate" id="chaosGate"><button type="button" aria-controls="genealogyPanel" aria-expanded="false"><span class="chaos-orbit orbit-a"></span><span class="chaos-orbit orbit-b"></span><img src="/chaos-smoke.png" alt=""><span class="chaos-void"></span><span class="chaos-copy"><b>渾沌</b><small>CHAOS</small><em>點擊進入眾神關係</em></span><svg class="chaos-morph" viewBox="0 0 800 600" aria-hidden="true"><g class="outline-child outline-left"><circle cx="0" cy="-42" r="24"/><ellipse cx="0" cy="2" rx="29" ry="34"/><path d="M-24-8L-57 8M24-8L57 8M-16 30L-35 63M16 30L35 63"/></g><g class="outline-child outline-right"><circle cx="0" cy="-42" r="24"/><ellipse cx="0" cy="2" rx="29" ry="34"/><path d="M-24-8L-57 8M24-8L57 8M-16 30L-35 63M16 30L35 63"/></g><path class="morph-line line-left" d="M250 376V420"/><path class="morph-line line-right" d="M550 376V420"/><rect class="morph-box box-left" x="145" y="420" width="210" height="92" rx="8"/><rect class="morph-box box-right" x="445" y="420" width="210" height="92" rx="8"/><g class="morph-labels"><text x="250" y="458">夜神耐特</text><text x="250" y="485">NYX · NIGHT</text><text x="550" y="458">厄瑞玻斯</text><text x="550" y="485">EREBUS · DARKNESS</text></g></svg></button></section>
   <section class="genealogy-panel" id="genealogyPanel" hidden><div class="diagram-heading"><div><small>FROM CHAOS TO OLYMPUS</small><h1>眾神關係</h1><p>從渾沌開始，沿著同一條脈絡往下閱讀；每位神只出現一次。</p></div></div>
   <div class="gene-legend"><span class="gene-double">夫妻</span><span class="gene-single">親子</span></div>
   <div class="genealogy-shell"><section class="genealogy-map genealogy-expanded" id="chaosGenealogy">
-    <svg viewBox="0 0 1400 1120" aria-hidden="true"><g class="gene-lines">
-      <path d="M700 96 V160 H480 V205 M700 160 H920 V205"/>
-      <path d="M480 285 V335 H700 V365"/><path d="M920 285 V335 H700 V365"/>
-      <line x1="620" y1="408" x2="780" y2="408"/><line x1="620" y1="414" x2="780" y2="414"/>
-      <path d="M700 414 V480 H530 V525 M700 480 H870 V525"/>
-      <line x1="610" y1="568" x2="790" y2="568"/><line x1="610" y1="574" x2="790" y2="574"/>
-      <path d="M700 574 V640 H120 V700 M700 640 H350 V700 M700 640 H580 V700 M700 640 H810 V700 M700 640 H1040 V700 M700 640 H1270 V700"/>
-      <line x1="660" y1="743" x2="730" y2="743"/><line x1="660" y1="749" x2="730" y2="749"/>
-      <path d="M580 785 V850 H360 V930 M580 850 H600 V930 M580 850 H840 V930 M580 850 H1080 V930"/>
-      <path d="M350 785 V870 H120 V930"/>
-    </g><g class="gene-mothers"><text x="700" y="505">泰坦神族 · THE TITANS</text><text x="360" y="910">由宙斯而生</text><text x="600" y="910">母：瑪亞 Maia</text><text x="840" y="910">母：勒托 Leto</text><text x="1080" y="910">母：狄俄涅 Dione</text><text x="120" y="910">波賽頓之子</text></g></svg>
-    ${box('', '渾沌','Chaos',610,20,180,'gene-root')}
-    ${box('', '夜神耐特','Nyx · Night',390,205,180,'gene-emerge gene-delay-1')}${box('', '厄瑞玻斯','Erebus · Darkness',830,205,180,'gene-emerge gene-delay-2')}
-    ${box('', '蓋亞','Gaia',540,365,160)}${box('', '烏拉諾斯','Uranus',780,365,160)}
-    ${box('', '瑞亞','Rhea',450,525,160)}${box('', '克羅諾斯','Cronus',790,525,160)}
-    ${box('', '赫斯提亞','Hestia',40,700)}${box('poseidon','波賽頓','Poseidon',270,700)}${box('zeus','宙斯','Zeus',500,700)}${box('hera','赫拉','Hera',730,700)}${box('', '狄蜜特','Demeter',960,700)}${box('', '黑帝斯','Hades',1190,700)}
-    ${box('polyphemus','波呂斐摩斯','Polyphemus',40,930)}${box('athena','雅典娜','Athena',280,930)}${box('hermes','赫米斯','Hermes',520,930)}${box('apollo','阿波羅','Apollo',760,930)}${box('aphrodite','阿芙蘿黛蒂','Aphrodite',1000,930)}
+    <svg viewBox="0 0 800 760" aria-hidden="true"><g class="gene-lines">
+      <path d="M400 86 V120 H270 V145 M400 120 H530 V145"/>
+      <path d="M270 225 V250 H320 V260 M530 225 V250 H480 V260"/>
+      <line x1="390" y1="303" x2="410" y2="303"/><line x1="390" y1="309" x2="410" y2="309"/>
+      <path d="M400 309 V350 H320 V375 M400 350 H480 V375"/>
+      <line x1="390" y1="418" x2="410" y2="418"/><line x1="390" y1="424" x2="410" y2="424"/>
+      <path d="M400 424 V480 H70 V510 M400 480 H200 V510 M400 480 H330 V510 M400 480 H460 V510 M400 480 H590 V510 M400 480 H720 V510"/>
+      <path d="M200 590 V625 H80 V670"/>
+      <path d="M330 590 V625 H240 V670 M330 625 H400 V670 M330 625 H560 V670 M330 625 H720 V670"/>
+    </g><g class="gene-mothers"><text x="400" y="365">泰坦神族 · THE TITANS</text></g></svg>
+    ${box('', '渾沌','Chaos',310,6,180,'gene-root')}
+    ${box('', '夜神耐特','Nyx · Night',190,145,160,'gene-emerge gene-delay-1')}${box('', '厄瑞玻斯','Erebus · Darkness',450,145,160,'gene-emerge gene-delay-2')}
+    ${box('', '蓋亞','Gaia',250,260,140)}${box('', '烏拉諾斯','Uranus',410,260,140)}
+    ${box('', '瑞亞','Rhea',250,375,140)}${box('', '克羅諾斯','Cronus',410,375,140)}
+    ${box('', '赫斯提亞','Hestia',15,510,110)}${box('poseidon','波賽頓','Poseidon',145,510,110)}${box('zeus','宙斯','Zeus',275,510,110)}${box('hera','赫拉','Hera',405,510,110)}${box('', '狄蜜特','Demeter',535,510,110)}${box('', '黑帝斯','Hades',665,510,110)}
+    ${box('polyphemus','波呂斐摩斯','Polyphemus',15,670,130)}${box('athena','雅典娜','Athena',175,670,130)}${box('hermes','赫米斯','Hermes',335,670,130)}${box('apollo','阿波羅','Apollo',495,670,130)}${box('aphrodite','阿芙蘿黛蒂','Aphrodite',655,670,130)}
   </section></div></section>`;
 }
 
 function bindChaosGenealogy(){
   const gate=document.querySelector('#chaosGate'),panel=document.querySelector('#genealogyPanel');if(!gate||!panel)return;
-  const shell=panel.querySelector('.genealogy-shell'),map=panel.querySelector('.genealogy-map');
-  const fit=()=>{if(!shell||!map||panel.hidden)return;const scale=Math.min(1,shell.clientWidth/1400);map.style.transform=`scale(${scale})`;shell.style.height=Math.ceil(1120*scale)+'px'};
-  if(shell&&window.ResizeObserver)new ResizeObserver(fit).observe(shell);
-  gate.querySelector('button')?.addEventListener('click',()=>{gate.classList.add('is-opening');setTimeout(()=>{gate.hidden=true;panel.hidden=false;panel.classList.add('is-revealed');requestAnimationFrame(()=>{fit();panel.scrollIntoView({behavior:'smooth',block:'start'})})},1050)});
+  gate.querySelector('button')?.addEventListener('click',()=>{gate.classList.add('is-opening');setTimeout(()=>{gate.hidden=true;panel.hidden=false;panel.classList.add('is-revealed');requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}))},2450)});
 }
 
 function bindRelationMap(){
