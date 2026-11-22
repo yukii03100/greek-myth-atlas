@@ -50,19 +50,17 @@ function home(){
   if(filter<0)filter=0;
   const cards=people.filter(p=>p[3][0]===filter);
   const selected=cards[0];
-  const fragments=[
-    ['blue-disc','shape',-46,-28,-2],['spear','spear.png',-62,20,-6],['temple','temple-column.png',54,-38,3],
-    ['athena','athena-bust.png',-24,18,-2],['shield','round-shield.png',12,64,5],
-    ['olive-left','olive-branch.png',-66,54,-7],['olive-right','olive-branch.png',58,58,7],
-    ['rubble-left','marble-rubble.png',-58,70,-7],['rubble-right','marble-rubble.png',64,72,6],
-    ['letter-m','M',22,-42,-2],['letter-y','Y',36,-22,2],['letter-t','T',48,4,-2],
-    ['letter-h','H',58,28,2],['letter-s','S',70,48,5],['blue-paper','shape',-34,64,-4],['fine-line','shape',62,-16,3]
-  ];
   return `<section class="poster ${posterSeen?"seen":""}" aria-label="MYTHS 雅典娜拼貼封面">
-    <img class="hero-reference hero-final-art" src="/hero-myths-serif.png" alt="MYTHS 雅典娜拼貼封面">
-    <img class="hero-s-vine" src="/hero-layers/olive-branch.png" alt="" aria-hidden="true">
-    <div class="hero-underlay"><img src="athena-figure.jpg" alt="雅典娜全身立像"></div>
-    <div class="hero-layers" aria-hidden="true">${fragments.map(([name,asset,x,y,r],index)=>asset.endsWith?.('.png')?`<img class="hero-fragment fragment-${name}" src="/hero-layers/${asset}" alt="" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">`:`<span class="hero-fragment fragment-${name}" style="--i:${index};--scatter-x:${x}px;--scatter-y:${y}px;--scatter-r:${r}deg">${asset==='shape'?'':asset}</span>`).join('')}</div>
+    <div class="hero-collage" aria-hidden="true">
+      <img class="hero-art" src="/hero-myths-serif.png" alt="">
+      <span class="hero-parallax hero-parallax-spear"></span>
+      <span class="hero-parallax hero-parallax-shield"></span>
+      <span class="hero-parallax hero-parallax-olive"></span>
+    </div>
+    <div class="hero-title" aria-label="MYTHS">
+      <span class="hero-word" aria-hidden="true">MYTH<span class="hero-s"><span class="hero-s-letter">S</span><img class="s-vine s-vine-back" src="/s-vine-real.png" alt=""><img class="s-vine s-vine-front" src="/s-vine-real.png" alt=""></span></span>
+      <span class="hero-word-blur" aria-hidden="true">MYTHS</span>
+    </div>
   </section>
   <section id="characters"><div class="section-heading"><p>CHARACTER ARCHIVE</p><h2>角色檔案</h2></div><div class="filters">${groups.slice(0,3).map((g,i)=>`<button data-filter="${i}" aria-pressed="${filter===i}">${g}</button>`).join('')}</div>
   <div class="character-showcase"><nav class="character-picker" aria-label="目前分類角色">${cards.map(([id,name])=>`<a href="#character/${id}" data-preview="${id}" class="${id===selected[0]?'is-active':''}"><span>${portrait(id)}</span><b>${name}</b></a>`).join('')}</nav>
@@ -95,25 +93,19 @@ function bindCharacterPreview(){
 function bindHero(){
   const poster=document.querySelector('.poster');
   if(!poster)return;
-  const fragments=[...poster.querySelectorAll('.hero-fragment')];
-  const underlay=poster.querySelector('.hero-underlay');
-  if(!fragments.length||!underlay)return;
-  const update=()=>{
-    const progress=Math.max(0,Math.min(1,(scrollY-40)/360));
-    poster.style.setProperty('--scatter',progress);
-    poster.classList.toggle('is-scattered',progress>.08);
-    underlay.style.opacity=String(.08+progress*.92);
-    underlay.style.transform=`scale(${.88+progress*.12})`;
-    fragments.forEach(fragment=>{
-      const x=parseFloat(fragment.style.getPropertyValue('--scatter-x'))*progress;
-      const y=parseFloat(fragment.style.getPropertyValue('--scatter-y'))*progress;
-      const r=parseFloat(fragment.style.getPropertyValue('--scatter-r'))*progress;
-      fragment.style.transform=`translate(${x}px,${y}px) rotate(${r}deg)`;
-      fragment.style.opacity=String(1-progress*.9);
-    });
+  const title=poster.querySelector('.hero-title');
+  const parallax=[...poster.querySelectorAll('.hero-parallax')];
+  const move=e=>{
+    const rect=poster.getBoundingClientRect();
+    const x=(e.clientX-rect.left)/rect.width-.5;
+    const y=(e.clientY-rect.top)/rect.height-.5;
+    poster.style.setProperty('--mx',`${x*18}px`);
+    poster.style.setProperty('--my',`${y*14}px`);
+    parallax.forEach((layer,index)=>layer.style.transform=`translate(${x*(index+1)*7}px,${y*(index+1)*5}px) rotate(${x*(index-1)*1.2}deg)`);
+    if(title){const t=title.getBoundingClientRect();title.style.setProperty('--blur-x',`${e.clientX-t.left}px`);title.style.setProperty('--blur-y',`${e.clientY-t.top}px`)}
   };
-  update();
-  addEventListener('scroll',update,{passive:true});
+  poster.addEventListener('pointermove',move);
+  poster.addEventListener('pointerleave',()=>{poster.style.setProperty('--mx','0px');poster.style.setProperty('--my','0px');parallax.forEach(layer=>layer.style.transform='')});
 }
 function detail([id,name,en,tags,bio,volumes]){
   const custom=saved[id]||{refs:[]};
@@ -190,7 +182,7 @@ function relationshipList(rows){
 }
 function relationshipView(){
   const box=(id,zh,en,x,y,w=160,extra='')=>`<a class="gene-node${id?' linked':''} ${extra}" ${id?`href="#character/${id}"`:''} style="--gx:${x};--gy:${y};--gw:${w}"><b>${zh}</b><small>${en}</small></a>`;
-  return `<section class="chaos-gate" id="chaosGate"><button type="button" aria-controls="genealogyPanel" aria-expanded="false"><span class="chaos-orbit orbit-a"></span><span class="chaos-orbit orbit-b"></span><img src="/chaos-smoke.png" alt=""><span class="chaos-void"></span><span class="chaos-copy"><b>渾沌</b><small>CHAOS</small><em>點擊進入眾神關係</em></span></button></section>
+  return `<section class="chaos-gate" id="chaosGate"><button type="button" aria-controls="genealogyPanel" aria-expanded="false"><span class="chaos-orbit orbit-a"></span><span class="chaos-orbit orbit-b"></span><img src="/chaos-smoke.png" alt=""><span class="chaos-void"></span><span class="chaos-copy"><b>渾沌</b><small>CHAOS</small><em>點擊進入眾神關係</em></span><span class="chaos-child child-left" aria-hidden="true"><i class="head"></i><i class="body"></i><i class="arm arm-a"></i><i class="arm arm-b"></i><i class="leg leg-a"></i><i class="leg leg-b"></i></span><span class="chaos-child child-right" aria-hidden="true"><i class="head"></i><i class="body"></i><i class="arm arm-a"></i><i class="arm arm-b"></i><i class="leg leg-a"></i><i class="leg leg-b"></i></span></button></section>
   <section class="genealogy-panel" id="genealogyPanel" hidden><div class="diagram-heading"><div><small>FROM CHAOS TO OLYMPUS</small><h1>眾神關係</h1><p>從渾沌開始，沿著同一條脈絡往下閱讀；每位神只出現一次。</p></div></div>
   <div class="gene-legend"><span class="gene-double">夫妻</span><span class="gene-single">親子</span></div>
   <div class="genealogy-shell"><section class="genealogy-map genealogy-expanded" id="chaosGenealogy">
@@ -219,7 +211,7 @@ function bindChaosGenealogy(){
   const shell=panel.querySelector('.genealogy-shell'),map=panel.querySelector('.genealogy-map');
   const fit=()=>{if(!shell||!map||panel.hidden)return;const scale=Math.min(1,shell.clientWidth/1400);map.style.transform=`scale(${scale})`;shell.style.height=Math.ceil(1120*scale)+'px'};
   if(shell&&window.ResizeObserver)new ResizeObserver(fit).observe(shell);
-  gate.querySelector('button')?.addEventListener('click',()=>{gate.classList.add('is-opening');setTimeout(()=>{gate.hidden=true;panel.hidden=false;panel.classList.add('is-revealed');requestAnimationFrame(()=>{fit();panel.scrollIntoView({behavior:'smooth',block:'start'})})},650)});
+  gate.querySelector('button')?.addEventListener('click',()=>{gate.classList.add('is-opening');setTimeout(()=>{gate.hidden=true;panel.hidden=false;panel.classList.add('is-revealed');requestAnimationFrame(()=>{fit();panel.scrollIntoView({behavior:'smooth',block:'start'})})},1050)});
 }
 
 function bindRelationMap(){
